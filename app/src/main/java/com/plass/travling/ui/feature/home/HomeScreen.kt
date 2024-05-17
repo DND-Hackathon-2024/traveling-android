@@ -54,23 +54,44 @@ fun HomeScreen(
     var location by remember {
         mutableStateOf("전체")
     }
-
+    
     var state by remember { mutableStateOf(emptyList<CouponResponse>()) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val clearState: () -> Unit = {
+        coroutineScope.launch(Dispatchers.Main) {
+            state = emptyList()
+        }
+    }
+
     LaunchedEffect(key1 = location) {
         coroutineScope.launch(Dispatchers.IO) {
-            Log.d("TAG", "HomeScreen: called $location")
-            kotlin.runCatching {
-                RetrofitBuilder.getCouponApi().couponWithLocation(location)
-            }.onSuccess {
-                coroutineScope.launch(Dispatchers.Main) {
-                    state = it.data
+            clearState()
+            if (location == "전체") {
+                kotlin.runCatching {
+                    RetrofitBuilder.getCouponApi().couponAll()
+                }.onSuccess {
+                    coroutineScope.launch(Dispatchers.Main) {
+                        state = it.data
+                    }
+                }.onFailure {
+                    coroutineScope.launch(Dispatchers.Main) {
+                        context.showShortToast("불러오기에 실패하였습니다.")
+                    }
                 }
-            }.onFailure {
-                coroutineScope.launch(Dispatchers.Main) {
-                    context.showShortToast("불러오기에 실패하였습니다.")
+            } else {
+                Log.d("TAG", "HomeScreen: called $location")
+                kotlin.runCatching {
+                    RetrofitBuilder.getCouponApi().couponWithLocation(location)
+                }.onSuccess {
+                    coroutineScope.launch(Dispatchers.Main) {
+                        state = it.data
+                    }
+                }.onFailure {
+                    coroutineScope.launch(Dispatchers.Main) {
+                        context.showShortToast("불러오기에 실패하였습니다.")
+                    }
                 }
             }
         }

@@ -17,4 +17,8 @@ interface CouponAPI {
         @Path("location") location: String
     ): BaseResponse<List<CouponResponse>>
 
+    @GET("/coupon/all")
+    suspend fun couponAll(
+    ): BaseResponse<List<CouponResponse>>
+
 }
