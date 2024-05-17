@@ -16,24 +16,33 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.plass.travling.local.SharedPreferencesManager
+import com.plass.travling.remote.RetrofitBuilder
+import com.plass.travling.remote.request.LoginRequest
 import com.plass.travling.ui.component.TVCTAButton
 import com.plass.travling.ui.component.TVTextField
 import com.plass.travling.ui.component.TVTopAppBar
+import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravelingTheme
+import com.plass.travling.utiles.showShortToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     hideBottomNav: () -> Unit,
 ) {
-
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         hideBottomNav()
     }
@@ -44,6 +53,17 @@ fun LoginScreen(
     var pw by remember {
         mutableStateOf("")
     }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    var insertText by remember { mutableStateOf("") }
+    val sendMessage: (String) -> Unit = {
+        coroutineScope.launch {
+            context.showShortToast(it)
+        }
+    }
+
+
     TVTopAppBar(
         text = "로그인",
         backgroundColor = TravelingTheme.colorScheme.White,
@@ -72,7 +92,26 @@ fun LoginScreen(
                     .padding(bottom = 8.dp),
                 text = "로그인"
             ) {
-
+                if (id.isEmpty()) {
+                    sendMessage("아이디가 입력되지 않았습니다.")
+                    return@TVCTAButton
+                }
+                if (pw.isEmpty()) {
+                    sendMessage("비밀번호가 입력되지 않았습니다.")
+                    return@TVCTAButton
+                }
+                coroutineScope.launch(Dispatchers.IO) {
+                    val token = RetrofitBuilder.getMemberApi().login(
+                        LoginRequest(
+                            phone = id,
+                            password = pw
+                        )
+                    ).data
+                    SharedPreferencesManager.set("token", token)
+                    coroutineScope.launch(Dispatchers.Main) {
+                        navController.navigate(NavRoot.HOME)
+                    }
+                }
             }
         }
     }

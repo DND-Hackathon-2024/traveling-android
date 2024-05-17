@@ -1,5 +1,6 @@
 package com.plass.travling.remote
 
+import com.google.gson.Gson
 import com.plass.travling.remote.interceptor.TokenInterceptor
 import com.plass.travling.remote.service.CouponAPI
 import com.plass.travling.remote.service.MemberAPI
@@ -7,6 +8,7 @@ import com.plass.travling.remote.service.PlaceApi
 import com.plass.travling.utiles.Env
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitBuilder {
     private var retrofit: Retrofit? = null
@@ -19,6 +21,7 @@ object RetrofitBuilder {
             retrofit = Retrofit.Builder()
                 .baseUrl(Env.BASE_URl)
                 .client(okhttpBuilder.build())
+                .addConverterFactory(GsonConverterFactory.create(Gson()))
                 .build()
         }
         return retrofit!!
@@ -28,6 +31,7 @@ object RetrofitBuilder {
         if (noTokenRetrofit == null) {
             noTokenRetrofit = Retrofit.Builder()
                 .baseUrl(Env.BASE_URl)
+                .addConverterFactory(GsonConverterFactory.create(Gson()))
                 .build()
         }
         return noTokenRetrofit!!

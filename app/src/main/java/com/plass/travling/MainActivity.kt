@@ -140,7 +140,7 @@ class MainActivity : ComponentActivity() {
                         NavHost(
                             modifier = Modifier.padding(it),
                             navController = navHostController,
-                            startDestination = NavRoot.HOME
+                            startDestination = NavRoot.LOGIN
                         ) {
 
                             composable(NavRoot.NFC_WRITE) {
