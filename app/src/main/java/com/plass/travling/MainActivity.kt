@@ -23,12 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.plass.travling.ui.feature.nfc.NfcTagDialog
-import com.plass.travling.ui.feature.locate.LocateScreen
+import com.plass.travling.ui.feature.home.HomeScreen
 import com.plass.travling.ui.feature.join.JoinScreen
 import com.plass.travling.ui.feature.locate.LocateItem
+import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.login.LoginScreen
 import com.plass.travling.ui.feature.nfc.NfcReadScreen
+import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.nfc.NfcWriteScreen
 import com.plass.travling.ui.feature.root.BottomNavItem
 import com.plass.travling.ui.feature.root.BottomNavigation
@@ -53,7 +54,7 @@ class MainActivity : ComponentActivity() {
             val coroutineScope = rememberCoroutineScope()
             val navHostController = rememberNavController()
             var navItems by remember { mutableStateOf(listOf(
-                BottomNavItem(NavRoot.MAIN, true, R.drawable.ic_home),
+                BottomNavItem(NavRoot.HOME, true, R.drawable.ic_home),
                 BottomNavItem("nfc", false, R.drawable.ic_nfc),
                 BottomNavItem(NavRoot.LOCATE, false, R.drawable.ic_locate),
             )) }
@@ -117,19 +118,8 @@ class MainActivity : ComponentActivity() {
                         NavHost(
                             modifier = Modifier.padding(it),
                             navController = navHostController,
-                            startDestination = NavRoot.MAIN
+                            startDestination = NavRoot.HOME
                         ) {
-                            composable(NavRoot.MAIN) {
-                                Column {
-                                    Button(onClick = { navHostController.navigate(NavRoot.NFC_WRITE) }) {
-                                        Text(text = "쓰기")
-                                    }
-
-                                    Button(onClick = { navHostController.navigate(NavRoot.NFC_READ) }) {
-                                        Text(text = "읽기")
-                                    }
-                                }
-                            }
 
                             composable(NavRoot.NFC_WRITE) {
                                 NfcWriteScreen(navController = navHostController)
@@ -150,6 +140,9 @@ class MainActivity : ComponentActivity() {
                                 JoinScreen(navController = navHostController) {
                                     changeBottomNav(false)
                                 }
+                            }
+                            composable(NavRoot.HOME) {
+                                HomeScreen(navController = navHostController)
                             }
                         }
                     }
