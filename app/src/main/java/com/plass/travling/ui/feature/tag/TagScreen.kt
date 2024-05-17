@@ -1,26 +1,48 @@
 package com.plass.travling.ui.feature.tag
 
 import android.app.Activity
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,8 +54,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.plass.travling.R
+import com.plass.travling.ui.component.ButtonState
 import com.plass.travling.ui.component.Coupon
 import com.plass.travling.ui.component.DropShadowType
+import com.plass.travling.ui.component.TVCTAButton
 import com.plass.travling.ui.component.dropShadow
 import com.plass.travling.ui.component.travelingVerticalGradient
 import com.plass.travling.ui.theme.TravelingColor
@@ -160,6 +184,35 @@ fun TagScreen(
             description = "\"병준이와 단둘이 데이트권\"과 교환 가능",
             category = "대구"
         )
+
+        Spacer(modifier = Modifier.height(74.dp))
+        Row(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.ic_instargram),
+                contentDescription = ""
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "공유",
+                color = TravelingTheme.colorScheme.White,
+                style = TravelingTheme.typography.headline2B
+            )
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        TagTVCTAButton(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .height(54.dp),
+            text = "확인",
+            textColor = TravelingTheme.colorScheme.Black
+        ) {
+            navController.popBackStack()
+        }
+        Spacer(modifier = Modifier.height(14.dp))
     }
 }
 
@@ -167,4 +220,105 @@ fun TagScreen(
 @Composable
 private fun Preview() {
     TagScreen(navController = rememberNavController(), data = "", {})
+}
+
+
+
+@Composable
+private fun TagTVCTAButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    enabled: Boolean = true,
+    isLoading: Boolean = false,
+    @DrawableRes leftIcon: Int? = null,
+    textColor: Color = TravelingTheme.colorScheme.White,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    onClick: () -> Unit,
+) {
+    val isEnabled = enabled && !isLoading
+
+    var buttonState by remember { mutableStateOf(ButtonState.Idle) }
+    val color = TravelingTheme.colorScheme.White
+    val scale by animateFloatAsState(
+        targetValue = if (buttonState == ButtonState.Idle) 1f else 0.96f,
+        label = "",
+    )
+    val animColor by animateColorAsState(
+        targetValue = if (buttonState == ButtonState.Idle) {
+            color
+        } else {
+            color
+        },
+        label = "",
+    )
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .pointerInput(buttonState) {
+                if (!isEnabled) return@pointerInput
+                awaitPointerEventScope {
+                    buttonState = if (buttonState == ButtonState.Hold) {
+                        waitForUpOrCancellation()
+                        ButtonState.Idle
+                    } else {
+                        awaitFirstDown(false)
+                        ButtonState.Hold
+                    }
+                }
+            },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = animColor,
+//            contentColor = TravelingTheme.colorScheme.textNormal,
+            disabledContainerColor = animColor,
+//            disabledContentColor = TravelingTheme.colorScheme.buttonTextDisabled,
+        ),
+        enabled = isEnabled,
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(0.dp),
+        interactionSource = interactionSource,
+    ) {
+//            if (isLoading) {
+//                RiveAnimation(
+//                    resId = R.raw.loading_dots,
+//                    contentDescription = "loading gif",
+//                    autoplay = true,
+//                    animationName = type.animName,
+//                )
+//            } else {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                color = TravelingTheme.colorScheme.Black,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TravelingTheme.colorScheme.Black
+                leftIcon?.let {
+                    Icon(
+                        modifier = Modifier
+                            .size(20.dp),
+                        painter =  painterResource(id = it),
+                        tint = textColor,
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    text = text,
+                    style = TravelingTheme.typography.bodyBold,
+                    color = textColor
+                )
+            }
+        }
+    }
 }
