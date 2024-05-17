@@ -220,7 +220,7 @@ fun CouponScreen(
                             )
                             .align(Alignment.CenterHorizontally)
                             .aspectRatio(16f / 9f),
-                        model = "https://barcode.orcascan.com/?type=code128&data=${state?.code}&format=png",
+                        model = "https://barcode.orcascan.com/?type=code128&data=${state?.code}&format=png&text=${state?.code}",
                         contentDescription = "바코드",
                     )
                 }
