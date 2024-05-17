@@ -1,10 +1,7 @@
-package com.plass.travling.ui.component
+package com.plass.travling.utiles
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 
 fun Context.showShortToast(
     text: String
