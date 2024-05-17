@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.plass.travling.ui.component.CustomBottomSheetDialog
 import com.plass.travling.ui.feature.locate.LocateItem
 import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.nfc.NfcReadScreen
@@ -64,6 +65,8 @@ class MainActivity : ComponentActivity() {
                     isShowBottomNavigationBar = it
                 }
             }
+            
+            var isShowNfcDialog by remember { mutableStateOf(false) }
 
             TravelingTheme {
                 // A surface container using the 'background' color from the theme
@@ -71,6 +74,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    if (isShowNfcDialog) {
+                        CustomBottomSheetDialog(
+                            title = "태깅 준비 완료",
+                            description = "NFC를 휴대폰 뒤쪽에 태깅해주세요",
+                            onClickCancel = {
+                                coroutineScope.launch {
+                                    isShowNfcDialog = false
+                                }
+                            },
+                            onClickConfirm = {
+
+                            }
+                        )
+                    }
+                    
                     Scaffold(
                         bottomBar = {
                             if (isShowBottomNavigationBar) {
@@ -88,7 +106,9 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     onClickNfc = {
-
+                                        coroutineScope.launch {
+                                            isShowNfcDialog = true
+                                        }
                                     }
                                 )
                             }
