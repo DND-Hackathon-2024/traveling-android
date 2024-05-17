@@ -69,7 +69,7 @@ fun Coupon(
             }
             Spacer(modifier = Modifier.width(14.dp))
             Category(text = category)
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.width(10.dp))
         }
         Box(
             modifier = Modifier
