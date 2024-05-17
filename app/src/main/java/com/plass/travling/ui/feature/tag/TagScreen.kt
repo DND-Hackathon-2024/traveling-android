@@ -58,6 +58,7 @@ import coil.compose.AsyncImage
 import com.plass.travling.R
 import com.plass.travling.remote.RetrofitBuilder
 import com.plass.travling.remote.response.CouponResponse
+import com.plass.travling.remote.response.PlaceResponse
 import com.plass.travling.ui.component.ButtonState
 import com.plass.travling.ui.component.Coupon
 import com.plass.travling.ui.component.DropShadowType
@@ -78,7 +79,8 @@ fun TagScreen(
 ) {
     val view = LocalView.current
     val coroutineScope = rememberCoroutineScope()
-    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", ""))}
+    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "", 0))}
+    var secondState by remember { mutableStateOf(PlaceResponse(0, "", "", "", -0, "", ))}
     LifecycleResumeEffect(key1 = Unit) {
         val activity = (view.context as Activity)
         activity.window.statusBarColor = TravelingColor.Blue.toArgb()
@@ -92,9 +94,16 @@ fun TagScreen(
         coroutineScope.launch(Dispatchers.IO) {
             kotlin.runCatching {
                 RetrofitBuilder.getCouponApi().couponById(data.replace("\u0000", "").toInt())
-            }.onSuccess {
-                coroutineScope.launch(Dispatchers.Main) {
-                    state = it.data
+            }.onSuccess { firstData ->
+                kotlin.runCatching {
+                    RetrofitBuilder.getPlaceApi().getTrap(firstData.data.trapId)
+                }.onSuccess { secondData ->
+                    coroutineScope.launch(Dispatchers.Main) {
+                        state = firstData.data
+                        secondState = secondData.data
+                    }
+                }.onFailure {
+                    it.printStackTrace()
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -143,7 +152,7 @@ fun TagScreen(
             Box {
                 AsyncImage(
                     modifier = Modifier.clip(RoundedCornerShape(20.dp)),
-                    model = "https://mblogthumb-phinf.pstatic.net/MjAyMzAyMDFfMTEz/MDAxNjc1MjQ2NjI5MTI5.rqbiSaXfZoGVSNIT8VJumWFyyShaHlPzqvNIQ15_ILkg.a0ABYCO3NtT-K9nIa_7xlTkf2uya9vZ_0_V-kDKWRKEg.JPEG.hans9090/SE-1ed8394f-3b4f-4331-ad97-baa590dde265.jpg?type=w800",
+                    model = secondState.imgUrl,
                     contentDescription = "",
                 )
                 Text(
@@ -153,7 +162,7 @@ fun TagScreen(
                             horizontal = 16.dp,
                             vertical = 13.dp
                         ),
-                    text = "${state.location}",
+                    text = secondState.address,
                     color = TravelingTheme.colorScheme.White,
                     style = TravelingTheme.typography.headline2B
                 )
@@ -181,7 +190,7 @@ fun TagScreen(
                     horizontal = 12.dp,
                     vertical = 8.dp
                 ),
-                text = "찾지 못한 트랩이 1개 더 있어요!",
+                text = if (state.trapId == 0) "" else "찾지 못한 트랩이 1개 더 있어요!",
                 color = TravelingTheme.colorScheme.Black,
                 style = TravelingTheme.typography.labelMedium
             )
@@ -196,7 +205,7 @@ fun TagScreen(
                     horizontal = 12.dp,
                     vertical = 8.dp
                 ),
-            text = "1개의 쿠폰을 발견했어요",
+            text = "${if (state.trapId != 0) 1 else ""}개의 쿠폰을 발견했어요",
             color = TravelingTheme.colorScheme.White,
             style = TravelingTheme.typography.headline1B
         )

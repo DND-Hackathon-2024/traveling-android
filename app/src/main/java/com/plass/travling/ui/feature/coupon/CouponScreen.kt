@@ -50,7 +50,7 @@ fun CouponScreen(
     id: Int
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "")) }
+    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "", 0)) }
     LaunchedEffect(key1 = true) {
         coroutineScope.launch(Dispatchers.IO) {
             kotlin.runCatching {

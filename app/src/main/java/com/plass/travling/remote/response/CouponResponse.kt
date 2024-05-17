@@ -16,6 +16,8 @@ data class CouponResponse(
     @SerializedName("couponDiscount")
     val couponDiscount: String,
     @SerializedName("couponCreateUserName")
-    val couponCreateUserName: String
+    val couponCreateUserName: String,
+    @SerializedName("trapId")
+    val trapId: Int
 
 )
