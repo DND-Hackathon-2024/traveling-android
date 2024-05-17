@@ -69,4 +69,6 @@ dependencies {
 
     implementation(libs.androidx.compose.lifecycle)
     implementation(libs.androidx.navigation)
+
+    implementation(libs.retrofit)
 }
