@@ -81,8 +81,9 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         nfcAdapter.disableReaderMode(this);
-//        vm.nfcInitialize()
     }
+
+    fun getNfcAdapter(): NfcAdapter = nfcAdapter
 }
 
 @Composable
