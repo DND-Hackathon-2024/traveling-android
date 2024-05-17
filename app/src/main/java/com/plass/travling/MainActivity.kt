@@ -11,7 +11,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.plass.travling.ui.feature.nfc.NfcReadScreen
 import com.plass.travling.ui.feature.nfc.NfcWriteScreen
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravlingTheme
@@ -48,14 +51,26 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navHostController,
-                        startDestination = NavRoot.NFC_WRITE
+                        startDestination = NavRoot.MAIN
                     ) {
                         composable(NavRoot.MAIN) {
+                            Column {
+                                Button(onClick = { navHostController.navigate(NavRoot.NFC_WRITE) }) {
+                                    Text(text = "쓰기")
+                                }
 
+                                Button(onClick = { navHostController.navigate(NavRoot.NFC_READ) }) {
+                                    Text(text = "읽기")
+                                }
+                            }
                         }
 
                         composable(NavRoot.NFC_WRITE) {
                             NfcWriteScreen(navController = navHostController)
+                        }
+
+                        composable(NavRoot.NFC_READ) {
+                            NfcReadScreen(navController = navHostController)
                         }
                     }
                 }
@@ -101,6 +116,7 @@ class MainActivity : ComponentActivity() {
 //    }
 
     fun getNfcAdapter(): NfcAdapter = nfcAdapter
+    fun getPending(): PendingIntent = pending
 }
 
 @Composable
