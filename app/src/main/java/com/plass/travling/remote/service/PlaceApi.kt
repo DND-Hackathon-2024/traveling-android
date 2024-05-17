@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface PlaceApi {
 
-    @GET("/place/list")
+    @GET("/trap/list")
     suspend fun getPlaceList(): BaseResponse<List<PlaceResponse>>
 }

@@ -1,5 +1,6 @@
 package com.plass.travling.ui.feature.locate
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,32 +12,47 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.plass.travling.remote.RetrofitBuilder
+import com.plass.travling.remote.response.PlaceResponse
 import com.plass.travling.ui.component.travelingHorizontalGradient
 import com.plass.travling.ui.theme.TravelingTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @Composable
 fun LocateScreen(
     navController: NavController
 ) {
-    val testItems = listOf(
-        LocateModel("대구소프트웨어 체육관 어딘가", 200, 5, "https://i.namu.wiki/i/7ivconN-POEZUVREF3kHCQo5C7Dhfc_KlSX6BbvJm4TXL8QQ-R5p-2AEvXV_gHZ4nFzzeGIx7ZbDyvMaOvu9dA.webp"),
-        LocateModel("대구소프트웨어 체육관 어딘가", 200, 5, "https://i.namu.wiki/i/7ivconN-POEZUVREF3kHCQo5C7Dhfc_KlSX6BbvJm4TXL8QQ-R5p-2AEvXV_gHZ4nFzzeGIx7ZbDyvMaOvu9dA.webp"),
-    )
+    val coroutineScope = rememberCoroutineScope()
 
-    val testItems2 = listOf(
-        LocateModel("종로고택점 스타벅스 남자화장실 어딘가", 10, 2, "https://i.namu.wiki/i/7ivconN-POEZUVREF3kHCQo5C7Dhfc_KlSX6BbvJm4TXL8QQ-R5p-2AEvXV_gHZ4nFzzeGIx7ZbDyvMaOvu9dA.webp"),
-        LocateModel("대구소프트웨어 체육관 어딘가", 4, 7, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq6-AUQPxjwV1A05pE1tdBt_yv8HKPB2TogFeat0pEOw&s"),
-        LocateModel("종로고택점 스타벅스 남자화장실 어딘가", 10, 2, "https://i.namu.wiki/i/7ivconN-POEZUVREF3kHCQo5C7Dhfc_KlSX6BbvJm4TXL8QQ-R5p-2AEvXV_gHZ4nFzzeGIx7ZbDyvMaOvu9dA.webp"),
-        LocateModel("대구소프트웨어 체육관 어딘가", 4, 7, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq6-AUQPxjwV1A05pE1tdBt_yv8HKPB2TogFeat0pEOw&s"),
-        LocateModel("종로고택점 스타벅스 남자화장실 어딘가", 10, 2, "https://i.namu.wiki/i/7ivconN-POEZUVREF3kHCQo5C7Dhfc_KlSX6BbvJm4TXL8QQ-R5p-2AEvXV_gHZ4nFzzeGIx7ZbDyvMaOvu9dA.webp"),
-        LocateModel("대구소프트웨어 체육관 어딘가", 4, 7, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq6-AUQPxjwV1A05pE1tdBt_yv8HKPB2TogFeat0pEOw&s"),
-        LocateModel("종로고택점 스타벅스 남자화장실 어딘가", 10, 2, "https://i.namu.wiki/i/7ivconN-POEZUVREF3kHCQo5C7Dhfc_KlSX6BbvJm4TXL8QQ-R5p-2AEvXV_gHZ4nFzzeGIx7ZbDyvMaOvu9dA.webp"),
-        LocateModel("대구소프트웨어 체육관 어딘가", 4, 7, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq6-AUQPxjwV1A05pE1tdBt_yv8HKPB2TogFeat0pEOw&s"),
-        )
+    var nowItem1 by remember { mutableStateOf(emptyList<PlaceResponse>()) }
+    var nowItem2 by remember { mutableStateOf(emptyList<PlaceResponse>()) }
+
+    LaunchedEffect(key1 = true) {
+        coroutineScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                RetrofitBuilder.getPlaceApi().getPlaceList()
+            }.onSuccess {
+                Log.d("TAG", "LocateScreen: ")
+                val data = it.data
+                nowItem1 = data.subList(0, 2)
+                nowItem2 = data.subList(2, data.size-1)
+            }.onFailure {
+
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,12 +85,12 @@ fun LocateScreen(
                     color = TravelingTheme.colorScheme.Black
                 )
             }
-            items(testItems) {
+            items(nowItem1) {
                 LocateItem(
-                    locate = it.locate,
-                    image = it.image,
-                    distance = it.distance,
-                    like = it.like
+                    locate = it.placeName,
+                    image = it.imgUrl,
+                    distance = Random.nextInt(1, 10),
+                    like = Random.nextInt(1, 10),
                 ) {
 
                 }
@@ -95,12 +111,12 @@ fun LocateScreen(
                     color = TravelingTheme.colorScheme.Black
                 )
             }
-            items(testItems2) {
+            items(nowItem2) {
                 LocateItem(
-                    locate = it.locate,
-                    image = it.image,
-                    distance = it.distance,
-                    like = it.like
+                    locate = it.placeName,
+                    image = it.imgUrl,
+                    distance = Random.nextInt(1, 10),
+                    like = Random.nextInt(1, 10),
                 ) {
 
                 }
