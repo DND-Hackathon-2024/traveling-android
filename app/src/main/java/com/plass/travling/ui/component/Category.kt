@@ -16,12 +16,13 @@ import com.plass.travling.ui.theme.TravelingTheme
 
 @Composable
 fun Category(
+    modifier: Modifier = Modifier,
     text: String,
     enabled: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     Text(
-        modifier = Modifier
+        modifier = modifier
             .background(TravelingTheme.colorScheme.White)
             .border(
                 border = BorderStroke(1.dp, Color(0xFFE3E3E3)),

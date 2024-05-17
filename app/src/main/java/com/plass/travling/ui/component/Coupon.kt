@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.plass.travling.R
@@ -27,26 +30,25 @@ fun Coupon(
     title: String,
     description: String,
     category: String,
+    isHome: Boolean = false
 ) {
-    Row(
+    Box(
         modifier = modifier
             .height(75.dp)
 
     ) {
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .fillMaxHeight()
                 .background(
                     color = TravelingTheme.colorScheme.White,
-                    shape = RoundedCornerShape(
-                        topStart = 4.dp,
-                        bottomStart = 4.dp
-                    )
+                    shape = RoundedCornerShape(4.dp)
                 )
                 .padding(
                     start = 10.dp,
                     top = 10.dp,
-                    bottom = 10.dp
+                    bottom = 10.dp,
                 )
         ) {
             Column(
@@ -67,12 +69,17 @@ fun Coupon(
                     style = TravelingTheme.typography.captionMedium
                 )
             }
-            Spacer(modifier = Modifier.width(14.dp))
-            Category(text = category)
+            Spacer(modifier = Modifier.weight(1f))
+            Category(
+                modifier = Modifier.offset(x = (-10).dp),
+                text = category,
+
+            )
             Spacer(modifier = Modifier.width(10.dp))
         }
         Box(
             modifier = Modifier
+                .align(Alignment.TopEnd)
                 .width(10.dp)
                 .fillMaxHeight()
                 .background(
@@ -87,7 +94,8 @@ fun Coupon(
                 modifier = Modifier
                     .align(Alignment.CenterEnd),
                 painter = painterResource(id = R.drawable.ic_coupon_polygon),
-                contentDescription = ""
+                contentDescription = "",
+                colorFilter = ColorFilter.tint(if (isHome) Color(0xFFF4F5F9) else Color(0xFF4546FE))
             )
         }
     }

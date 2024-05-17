@@ -179,7 +179,9 @@ fun TagScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Coupon(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(horizontal = 22.dp),
             title = "40% 할인 쿠폰",
             description = "\"병준이와 단둘이 데이트권\"과 교환 가능",
             category = "대구"
