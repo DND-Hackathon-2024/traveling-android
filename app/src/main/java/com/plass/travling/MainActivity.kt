@@ -14,17 +14,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.plass.travling.ui.feature.nfc.NfcTagDialog
+import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.join.JoinScreen
 import com.plass.travling.ui.feature.locate.LocateItem
 import com.plass.travling.ui.feature.login.LoginScreen
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
             var navItems by remember { mutableStateOf(listOf(
                 BottomNavItem(NavRoot.MAIN, true, R.drawable.ic_home),
                 BottomNavItem("nfc", false, R.drawable.ic_nfc),
-                BottomNavItem(NavRoot.NFC_WRITE, false, R.drawable.ic_locate),
+                BottomNavItem(NavRoot.LOCATE, false, R.drawable.ic_locate),
             )) }
 
             var isShowBottomNavigationBar by remember { mutableStateOf(true) }
@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
                     isShowBottomNavigationBar = it
                 }
             }
+            
+            var isShowNfcDialog by remember { mutableStateOf(false) }
 
             TravelingTheme {
                 // A surface container using the 'background' color from the theme
@@ -72,6 +74,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    if (isShowNfcDialog) {
+                        NfcTagDialog(
+                            title = "태깅 준비 완료",
+                            description = "NFC를 휴대폰 뒤쪽에 태깅해주세요",
+                            onClickCancel = {
+                                coroutineScope.launch {
+                                    isShowNfcDialog = false
+                                }
+                            },
+                            onClickConfirm = {
+
+                            }
+                        )
+                    }
+                    
                     Scaffold(
                         bottomBar = {
                             if (isShowBottomNavigationBar) {
@@ -89,7 +106,9 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     onClickNfc = {
-
+                                        coroutineScope.launch {
+                                            isShowNfcDialog = true
+                                        }
                                     }
                                 )
                             }
@@ -102,9 +121,6 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(NavRoot.MAIN) {
                                 Column {
-                                    LocateItem(locate = "test", resId = R.drawable.ic_profile, distance = 5, like = 3) {
-
-                                    }
                                     Button(onClick = { navHostController.navigate(NavRoot.NFC_WRITE) }) {
                                         Text(text = "쓰기")
                                     }
@@ -121,6 +137,9 @@ class MainActivity : ComponentActivity() {
 
                             composable(NavRoot.NFC_READ) {
                                 NfcReadScreen(navController = navHostController)
+                            }
+                            composable(NavRoot.LOCATE) {
+                                LocateScreen(navController = navHostController)
                             }
                             composable(NavRoot.LOGIN) {
                                 LoginScreen(navController = navHostController) {
@@ -139,59 +158,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        nfcAdapter.enableReaderMode(this, NfcAdapter.ReaderCallback { tag: Tag? ->
-//            val testData = "https://byungjuns.xyz"
-//            val message = NdefMessage(NdefRecord.createUri(testData))
-//            val size = message.toByteArray().size
-//
-//            try {
-//                val ndef = Ndef.get(tag)
-//                if (ndef != null) {
-//                    ndef.connect()
-//                    if (!ndef.isWritable) {
-//                        Log.e("enter", "cannot write")
-//                    }
-//                    if (ndef.maxSize < size) {
-//                        Log.e("enter", "cannot size exception")
-//                    }
-//                    ndef.writeNdefMessage(message)
-//                    Log.d("TAG", "onStart: 성공")
-////                    vm.nfcSuccess()
-//                }
-//            } catch (e: Exception) {
-//                Log.i("writeError", e.message.toString());
-//            }},
-//            NfcAdapter.FLAG_READER_NFC_A
-//                    or NfcAdapter.FLAG_READER_NFC_B
-//                    or NfcAdapter.FLAG_READER_NFC_F
-//                    or NfcAdapter.FLAG_READER_NFC_V
-//                    or NfcAdapter.FLAG_READER_NFC_BARCODE,
-//            null)
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        nfcAdapter.disableReaderMode(this);
-//    }
 
     fun getNfcAdapter(): NfcAdapter = nfcAdapter
-    fun getPending(): PendingIntent = pending
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TravelingTheme {
-        Greeting("Android")
-    }
 }
