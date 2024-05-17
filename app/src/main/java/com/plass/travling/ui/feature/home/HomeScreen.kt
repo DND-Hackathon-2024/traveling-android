@@ -48,7 +48,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    changeBottomVisible: (Boolean) -> Unit
 ) {
     var location by remember {
         mutableStateOf("전체")
@@ -73,6 +74,10 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(key1 = true) {
+        changeBottomVisible(true)
     }
 
     Column(
@@ -140,7 +145,7 @@ fun HomeScreen(
                 .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(arrayListOf("전체", "대구", "부산", "서울", "광주", "인천", "공주")) {
+            items(arrayListOf("전체", "대구", "포항", "경주", "청도", "마산", "김해")) {
                 LocationCell(text = it, selected = it == location) {
                     location = it
                 }

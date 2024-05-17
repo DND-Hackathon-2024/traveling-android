@@ -164,7 +164,10 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             composable(NavRoot.HOME) {
-                                HomeScreen(navController = navHostController)
+                                HomeScreen(
+                                    navController = navHostController,
+                                    changeBottomVisible = changeBottomNav
+                                )
                             }
 
                             composable(
