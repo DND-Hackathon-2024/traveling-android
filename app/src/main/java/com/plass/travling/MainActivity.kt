@@ -191,7 +191,8 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 CouponScreen(
                                     navController = navHostController,
-                                    id = it.arguments?.getInt("id")!!
+                                    id = it.arguments?.getInt("id")!!,
+                                    changeBottomNav = changeBottomNav
                                 )
                             }
                         }

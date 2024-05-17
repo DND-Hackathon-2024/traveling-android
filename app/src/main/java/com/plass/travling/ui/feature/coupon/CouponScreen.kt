@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import coil.compose.AsyncImage
 import com.plass.travling.R
 import com.plass.travling.remote.RetrofitBuilder
 import com.plass.travling.remote.response.CouponResponse
+import com.plass.travling.remote.response.PlaceResponse
 import com.plass.travling.ui.component.Category
 import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.theme.TravelingTheme
@@ -47,20 +49,38 @@ import kotlinx.coroutines.launch
 @Composable
 fun CouponScreen(
     navController: NavController,
-    id: Int
+    id: Int,
+    changeBottomNav: (Boolean) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "", 0)) }
+    var secondState by remember { mutableStateOf(PlaceResponse(0, "", "", "", -0, "", ))}
+
     LaunchedEffect(key1 = true) {
+        changeBottomNav(false)
         coroutineScope.launch(Dispatchers.IO) {
             kotlin.runCatching {
                 RetrofitBuilder.getCouponApi().couponById(id)
-            }.onSuccess {
-                state = it.data
+            }.onSuccess { firstData ->
+                kotlin.runCatching {
+                    RetrofitBuilder.getPlaceApi().getTrap(firstData.data.trapId)
+                }.onSuccess { secondData ->
+                    coroutineScope.launch(Dispatchers.Main) {
+                        state = firstData.data
+                        secondState = secondData.data
+                    }
+                }.onFailure {
+                    it.printStackTrace()
+                }
             }.onFailure {
 
             }
         }
+    }
+
+    DisposableEffect(key1 = navController) {
+        changeBottomNav(true)
+        onDispose {  }
     }
     
     Scaffold(
@@ -96,7 +116,7 @@ fun CouponScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f),
-                    model = "https://mblogthumb-phinf.pstatic.net/MjAyMzAyMDFfMTEz/MDAxNjc1MjQ2NjI5MTI5.rqbiSaXfZoGVSNIT8VJumWFyyShaHlPzqvNIQ15_ILkg.a0ABYCO3NtT-K9nIa_7xlTkf2uya9vZ_0_V-kDKWRKEg.JPEG.hans9090/SE-1ed8394f-3b4f-4331-ad97-baa590dde265.jpg?type=w800",
+                    model = secondState.imgUrl,
                     contentDescription = "",
                     contentScale = ContentScale.Crop
                 )
@@ -107,7 +127,7 @@ fun CouponScreen(
                             start = 12.dp,
                             bottom = 20.dp
                         ),
-                    text = "대구광역시동부도서관",
+                    text = secondState.address,
                     color = TravelingTheme.colorScheme.White,
                     style = TravelingTheme.typography.headline2B
                 )
