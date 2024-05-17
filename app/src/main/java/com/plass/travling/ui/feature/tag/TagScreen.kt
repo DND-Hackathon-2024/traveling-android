@@ -253,7 +253,7 @@ fun TagScreen(
                         .padding(horizontal = 22.dp),
                     title = "${state?.couponDiscount} 할인 쿠폰",
                     description = state?.description ?: "",
-                    category = "대구"
+                    category = state?.location?: ""
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
