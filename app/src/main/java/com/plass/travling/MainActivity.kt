@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.plass.travling.ui.feature.home.HomeScreen
 import androidx.navigation.navArgument
+import com.plass.travling.local.SharedPreferencesManager
 import com.plass.travling.ui.feature.coupon.CouponScreen
 import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.locate.LocateScreen
@@ -140,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         NavHost(
                             modifier = Modifier.padding(it),
                             navController = navHostController,
-                            startDestination = NavRoot.LOGIN
+                            startDestination = getStartDestination()
                         ) {
 
                             composable(NavRoot.NFC_WRITE) {
@@ -207,6 +208,12 @@ class MainActivity : ComponentActivity() {
 
         this.window.statusBarColor = TravelingColor.Blue.toArgb()
     }
+
+    private fun getStartDestination(): String {
+        val token = SharedPreferencesManager.get("token") ?: ""
+        return if (token.isEmpty()) NavRoot.LOGIN else NavRoot.HOME
+    }
+
 
 
     fun getNfcAdapter(): NfcAdapter = nfcAdapter

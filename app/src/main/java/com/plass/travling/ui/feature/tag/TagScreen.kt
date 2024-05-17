@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -118,135 +119,139 @@ fun TagScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = travelingVerticalGradient()
-            )
-            .verticalScroll(rememberScrollState())
-    ) {
-        Text(
-            modifier = Modifier.padding(
-                horizontal = 16.dp,
-                vertical = 10.dp
-            ),
-            text = "태깅 성공",
-            color = TravelingTheme.colorScheme.White,
-            style = TravelingTheme.typography.headline1M
-        )
-        Spacer(modifier = Modifier.height(56.dp))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "${state.location}에서\n새 트랩을 찾았어요!",
-            textAlign = TextAlign.Center,
-            color = TravelingTheme.colorScheme.White,
-            style = TravelingTheme.typography.title2B
-        )
-        Spacer(modifier = Modifier.height(58.dp))
-        Surface(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            shadowElevation = 4.dp,
-            shape = RoundedCornerShape(20.dp),
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = travelingVerticalGradient())
+                .verticalScroll(rememberScrollState())
         ) {
-            Box {
-                AsyncImage(
-                    modifier = Modifier.clip(RoundedCornerShape(20.dp)),
-                    model = secondState.imgUrl,
-                    contentDescription = "",
-                )
+            Text(
+                modifier = Modifier.padding(
+                    horizontal = 16.dp,
+                    vertical = 10.dp
+                ),
+                text = "태깅 성공",
+                color = TravelingTheme.colorScheme.White,
+                style = TravelingTheme.typography.headline1M
+            )
+            Spacer(modifier = Modifier.height(56.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "${state.location}에서\n새 트랩을 찾았어요!",
+                textAlign = TextAlign.Center,
+                color = TravelingTheme.colorScheme.White,
+                style = TravelingTheme.typography.title2B
+            )
+            Spacer(modifier = Modifier.height(58.dp))
+            Surface(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                shadowElevation = 4.dp,
+                shape = RoundedCornerShape(20.dp),
+            ) {
+                Box {
+                    AsyncImage(
+                        modifier = Modifier.clip(RoundedCornerShape(20.dp)),
+                        model = secondState.imgUrl,
+                        contentDescription = "",
+                        contentScale = ContentScale.FillBounds
+                    )
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 13.dp
+                            ),
+                        text = secondState.address,
+                        color = TravelingTheme.colorScheme.White,
+                        style = TravelingTheme.typography.headline2B
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Image(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth(),
+                painter = painterResource(id = R.drawable.ic_polygon),
+                contentDescription = ""
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .background(
+                        color = TravelingTheme.colorScheme.White,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 13.dp
-                        ),
-                    text = secondState.address,
+                    modifier = Modifier.padding(
+                        horizontal = 12.dp,
+                        vertical = 8.dp
+                    ),
+                    text = if (state.trapId == 0) "" else "찾지 못한 트랩이 1개 더 있어요!",
+                    color = TravelingTheme.colorScheme.Black,
+                    style = TravelingTheme.typography.labelMedium
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(98.dp))
+            Text(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 8.dp
+                    ),
+                text = "${if (state.trapId != 0) 1 else ""}개의 쿠폰을 발견했어요",
+                color = TravelingTheme.colorScheme.White,
+                style = TravelingTheme.typography.headline1B
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Coupon(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 22.dp),
+                title = "${state.couponDiscount} 할인 쿠폰",
+                description = state.description,
+                category = "대구"
+            )
+
+            Spacer(modifier = Modifier.height(74.dp))
+            Row(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_instargram),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "공유",
                     color = TravelingTheme.colorScheme.White,
                     style = TravelingTheme.typography.headline2B
                 )
             }
+            Spacer(modifier = Modifier.height(14.dp))
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        Image(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .fillMaxWidth(),
-            painter = painterResource(id = R.drawable.ic_polygon),
-            contentDescription = ""
-        )
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .background(
-                    color = TravelingTheme.colorScheme.White,
-                    shape = RoundedCornerShape(8.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                modifier = Modifier.padding(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
-                ),
-                text = if (state.trapId == 0) "" else "찾지 못한 트랩이 1개 더 있어요!",
-                color = TravelingTheme.colorScheme.Black,
-                style = TravelingTheme.typography.labelMedium
-            )
+        Column {
+            Spacer(modifier = Modifier.weight(1f))
+            TagTVCTAButton(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 8.dp)
+                    .height(54.dp),
+                text = "확인",
+                textColor = TravelingTheme.colorScheme.Black
+            ) {
+                navController.popBackStack()
+            }
         }
-
-
-        Spacer(modifier = Modifier.height(98.dp))
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
-                ),
-            text = "${if (state.trapId != 0) 1 else ""}개의 쿠폰을 발견했어요",
-            color = TravelingTheme.colorScheme.White,
-            style = TravelingTheme.typography.headline1B
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Coupon(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 22.dp),
-            title = "${state.couponDiscount} 할인 쿠폰",
-            description = state.description,
-            category = "대구"
-        )
-
-        Spacer(modifier = Modifier.height(74.dp))
-        Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(id = R.drawable.ic_instargram),
-                contentDescription = ""
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "공유",
-                color = TravelingTheme.colorScheme.White,
-                style = TravelingTheme.typography.headline2B
-            )
-        }
-        Spacer(modifier = Modifier.height(14.dp))
-        TagTVCTAButton(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .height(54.dp),
-            text = "확인",
-            textColor = TravelingTheme.colorScheme.Black
-        ) {
-            navController.popBackStack()
-        }
-        Spacer(modifier = Modifier.height(14.dp))
     }
 }
 
