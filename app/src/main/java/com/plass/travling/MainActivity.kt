@@ -14,19 +14,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.plass.travling.ui.component.CustomBottomSheetDialog
-import com.plass.travling.ui.feature.locate.LocateItem
+import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.nfc.NfcReadScreen
 import com.plass.travling.ui.feature.nfc.NfcWriteScreen
@@ -75,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     if (isShowNfcDialog) {
-                        CustomBottomSheetDialog(
+                        NfcTagDialog(
                             title = "태깅 준비 완료",
                             description = "NFC를 휴대폰 뒤쪽에 태깅해주세요",
                             onClickCancel = {
