@@ -1,5 +1,6 @@
 package com.plass.travling.ui.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,22 +21,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.plass.travling.R
+import com.plass.travling.remote.RetrofitBuilder
+import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.ui.component.Coupon
 import com.plass.travling.ui.component.TVTopAppBar
 import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravelingTheme
+import com.plass.travling.utiles.showShortToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -44,12 +53,26 @@ fun HomeScreen(
     var location by remember {
         mutableStateOf("전체")
     }
-    val testItems by remember {
-        mutableStateOf(listOf(
-            CouponModel(0, "40% 할인 쿠폰", "다른 쿠폰와 교환 가능", "대구"),
-            CouponModel(1, "100% 할인 쿠폰", "형이 쏜다", "대구"),
-            CouponModel(2, "10% 할인 쿠폰", "\"예성이\"와 교환 가능", "대구"),
-        ))
+
+    var state by remember { mutableStateOf(emptyList<CouponResponse>()) }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = location) {
+        coroutineScope.launch(Dispatchers.IO) {
+            Log.d("TAG", "HomeScreen: called $location")
+            kotlin.runCatching {
+                RetrofitBuilder.getCouponApi().couponWithLocation(location)
+            }.onSuccess {
+                coroutineScope.launch(Dispatchers.Main) {
+                    state = it.data
+                }
+            }.onFailure {
+                coroutineScope.launch(Dispatchers.Main) {
+                    context.showShortToast("불러오기에 실패하였습니다.")
+                }
+            }
+        }
     }
 
     Column(
@@ -108,7 +131,7 @@ fun HomeScreen(
                 top = 4.dp,
                 bottom = 4.dp
             ),
-            text = "사용가능한 트랩이\n3개 남아있어요",
+            text = "사용가능한 트랩이\n${state.size}개 남아있어요",
             color = TravelingTheme.colorScheme.Black,
             style = TravelingTheme.typography.headline2B
         )
@@ -127,19 +150,19 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(testItems) {
+            items(state) {
                 Coupon(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
                         .bounceClick {
                             navController.navigate(
-                                NavRoot.COUPON.replace("{id}", "${it.id}")
+                                NavRoot.COUPON.replace("{id}", "${it.couponId}")
                             )
                         },
-                    title = it.title,
+                    title = it.couponName,
                     description = it.description,
-                    category = it.category,
+                    category = it.location,
                     isHome = true
                 )
             }

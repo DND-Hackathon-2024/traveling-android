@@ -49,10 +49,10 @@ fun LoginScreen(
     }
 
     var id by remember {
-        mutableStateOf("")
+        mutableStateOf("test")
     }
     var pw by remember {
-        mutableStateOf("")
+        mutableStateOf("test")
     }
 
     val coroutineScope = rememberCoroutineScope()
