@@ -2,10 +2,14 @@ package com.plass.travling.ui.feature.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +31,7 @@ import com.plass.travling.ui.theme.TravelingTheme
 @Composable
 fun LoginScreen(
     navController: NavController,
-    hideBottomNav: () -> Unit
+    hideBottomNav: () -> Unit,
 ) {
 
     LaunchedEffect(Unit) {
@@ -40,10 +44,15 @@ fun LoginScreen(
     var pw by remember {
         mutableStateOf("")
     }
-    TVTopAppBar(text = "로그인") {
+    TVTopAppBar(
+        text = "로그인",
+        backgroundColor = TravelingTheme.colorScheme.White,
+        textColor = TravelingTheme.colorScheme.Black
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = 12.dp)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

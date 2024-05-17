@@ -27,6 +27,7 @@ import com.plass.travling.ui.theme.TravelingTheme
 fun TVTopAppBar(
     modifier: Modifier = Modifier,
     text: String,
+    textColor: Color = TravelingTheme.colorScheme.White,
     backgroundColor: Color = TravelingTheme.colorScheme.Blue,
     onClickBackButton: (() -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
@@ -72,7 +73,7 @@ fun TVTopAppBar(
                         ),
                     text = text,
                     style = textStyle,
-                    color = TravelingTheme.colorScheme.White
+                    color = textColor
                 )
             }
 
