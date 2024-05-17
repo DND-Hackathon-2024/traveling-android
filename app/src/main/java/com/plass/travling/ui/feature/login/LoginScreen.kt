@@ -112,7 +112,11 @@ fun LoginScreen(
                     }.onSuccess {
                         SharedPreferencesManager.set("token", it.data)
                         coroutineScope.launch(Dispatchers.Main) {
-                            navController.navigate(NavRoot.HOME)
+                            navController.navigate(NavRoot.HOME) {
+                                popUpTo(NavRoot.LOGIN) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     }.onFailure {
                         sendMessage("로그인에 실패하였습니다.")
