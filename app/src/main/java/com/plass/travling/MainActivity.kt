@@ -25,6 +25,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.locate.LocateScreen
+import com.plass.travling.ui.feature.join.JoinScreen
+import com.plass.travling.ui.feature.locate.LocateItem
+import com.plass.travling.ui.feature.login.LoginScreen
 import com.plass.travling.ui.feature.nfc.NfcReadScreen
 import com.plass.travling.ui.feature.nfc.NfcWriteScreen
 import com.plass.travling.ui.feature.root.BottomNavItem
@@ -137,6 +140,16 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(NavRoot.LOCATE) {
                                 LocateScreen(navController = navHostController)
+                            }
+                            composable(NavRoot.LOGIN) {
+                                LoginScreen(navController = navHostController) {
+                                    changeBottomNav(false)
+                                }
+                            }
+                            composable(NavRoot.JOIN) {
+                                JoinScreen(navController = navHostController) {
+                                    changeBottomNav(false)
+                                }
                             }
                         }
                     }

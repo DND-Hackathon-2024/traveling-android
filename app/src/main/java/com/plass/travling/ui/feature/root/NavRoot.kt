@@ -7,4 +7,6 @@ object NavRoot {
     const val NFC_READ = "NFC_READ"
 
     const val LOCATE = "LOCATE"
+    const val LOGIN = "LOGIN"
+    const val JOIN = "JOIN"
 }
