@@ -20,6 +20,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,15 +36,33 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.plass.travling.R
+import com.plass.travling.remote.RetrofitBuilder
+import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.ui.component.Category
 import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.theme.TravelingTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun CouponScreen(
     navController: NavController,
     id: Int
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "")) }
+    LaunchedEffect(key1 = true) {
+        coroutineScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                RetrofitBuilder.getCouponApi().couponById(id)
+            }.onSuccess {
+                state = it.data
+            }.onFailure {
+
+            }
+        }
+    }
+    
     Scaffold(
         topBar = {
             Row(
@@ -103,25 +127,25 @@ fun CouponScreen(
                 Spacer(modifier = Modifier.height(28.dp))
                 Category(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "대구"
+                    text = state.location
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "40% 할인 쿠폰",
+                    text = "${state.couponDiscount} ${state.couponName}",
                     color = TravelingTheme.colorScheme.Black,
                     style = TravelingTheme.typography.headline2B
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Image(
+                AsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             horizontal = 24.dp
                         )
                         .align(Alignment.CenterHorizontally)
-                        .aspectRatio(16f/9f),
-                    painter = painterResource(id = R.drawable.ic_barcode),
+                        .aspectRatio(16f / 9f),
+                    model = "https://barcode.orcascan.com/?type=code128&data=${state.code}&format=png",
                     contentDescription = "바코드",
                 )
                 Spacer(modifier = Modifier.height(16.dp))
