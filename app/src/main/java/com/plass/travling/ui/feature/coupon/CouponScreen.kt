@@ -42,6 +42,7 @@ import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.remote.response.PlaceResponse
 import com.plass.travling.ui.component.Category
 import com.plass.travling.ui.component.bounceClick
+import com.plass.travling.ui.component.shimmerEffect
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,8 +54,8 @@ fun CouponScreen(
     changeBottomNav: (Boolean) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "", 0)) }
-    var secondState by remember { mutableStateOf(PlaceResponse(0, "", "", "", -0, "", ))}
+    var state by remember { mutableStateOf<CouponResponse?>(null) }
+    var secondState by remember { mutableStateOf<PlaceResponse?>(null) }
 
     LaunchedEffect(key1 = true) {
         changeBottomNav(false)
@@ -80,9 +81,9 @@ fun CouponScreen(
 
     DisposableEffect(key1 = navController) {
         changeBottomNav(true)
-        onDispose {  }
+        onDispose { }
     }
-    
+
     Scaffold(
         topBar = {
             Row(
@@ -112,25 +113,47 @@ fun CouponScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f),
-                    model = secondState.imgUrl,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop
-                )
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(
-                            start = 12.dp,
-                            bottom = 20.dp
-                        ),
-                    text = secondState.address,
-                    color = TravelingTheme.colorScheme.White,
-                    style = TravelingTheme.typography.headline2B
-                )
+                secondState?.imgUrl.let {
+                    if (it != null) {
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(16f / 9f),
+                            model = secondState?.imgUrl ?: "",
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(
+                                    start = 12.dp,
+                                    bottom = 20.dp
+                                ),
+                            text = secondState?.address ?: "",
+                            color = TravelingTheme.colorScheme.White,
+                            style = TravelingTheme.typography.headline2B
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(16f / 9f)
+                                .background(shimmerEffect())
+                        )
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .width(240.dp)
+                                .height(20.dp)
+                                .padding(
+                                    start = 12.dp,
+                                    bottom = 20.dp
+                                )
+                                .background(shimmerEffect(), RoundedCornerShape(8.dp))
+                        )
+                    }
+                }
             }
 
             Column(
@@ -145,29 +168,62 @@ fun CouponScreen(
                     )
             ) {
                 Spacer(modifier = Modifier.height(28.dp))
-                Category(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = state.location
-                )
+                if (state?.location == null) {
+                    Box(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(20.dp)
+                            .background(shimmerEffect(), RoundedCornerShape(4.dp))
+                            .align(Alignment.CenterHorizontally)
+                    )
+                } else {
+                    Category(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = state?.location ?: ""
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "${state.couponDiscount} ${state.couponName}",
-                    color = TravelingTheme.colorScheme.Black,
-                    style = TravelingTheme.typography.headline2B
-                )
+                if (state?.couponDiscount == null) {
+                    Box(
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(20.dp)
+                            .background(shimmerEffect(), RoundedCornerShape(4.dp))
+                            .align(Alignment.CenterHorizontally)
+                    )
+                } else {
+                    Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = "${state?.couponDiscount ?: ""} ${state?.couponName ?: ""}",
+                        color = TravelingTheme.colorScheme.Black,
+                        style = TravelingTheme.typography.headline2B
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 24.dp
-                        )
-                        .align(Alignment.CenterHorizontally)
-                        .aspectRatio(16f / 9f),
-                    model = "https://barcode.orcascan.com/?type=code128&data=${state.code}&format=png",
-                    contentDescription = "바코드",
-                )
+                if (state?.code == null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 24.dp
+                            )
+                            .align(Alignment.CenterHorizontally)
+                            .aspectRatio(16f / 9f)
+                            .background(shimmerEffect(), RoundedCornerShape(8.dp))
+                    )
+                } else {
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 24.dp
+                            )
+                            .align(Alignment.CenterHorizontally)
+                            .aspectRatio(16f / 9f),
+                        model = "https://barcode.orcascan.com/?type=code128&data=${state?.code}&format=png",
+                        contentDescription = "바코드",
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier

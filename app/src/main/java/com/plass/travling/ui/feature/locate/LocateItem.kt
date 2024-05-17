@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.plass.travling.R
+import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.component.rippleClickable
 import com.plass.travling.ui.theme.TravelingTheme
 
@@ -38,7 +39,7 @@ fun LocateItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .rippleClickable(onClick = onClickItem)
+            .bounceClick(onClick = onClickItem)
     ) {
         Column(
             modifier = Modifier

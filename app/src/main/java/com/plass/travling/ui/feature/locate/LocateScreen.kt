@@ -54,7 +54,7 @@ fun LocateScreen(
                 Log.d("TAG", "LocateScreen: ")
                 val data = it.data
                 nowItem1 = data.subList(0, 2)
-                nowItem2 = data.subList(2, data.size-1)
+                nowItem2 = data.subList(2, data.size - 1)
                 coroutineScope.launch(Dispatchers.Main) {
                     isFetching = false
                 }
@@ -88,10 +88,12 @@ fun LocateScreen(
         LazyColumn {
             item {
                 Text(
-                    modifier = Modifier.padding(
-                        horizontal = 12.dp,
-                        vertical = 4.dp
-                    ),
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 4.dp
+                        )
+                        .padding(start = 4.dp),
                     text = "가장 가까이 있어요",
                     style = TravelingTheme.typography.headline2B,
                     color = TravelingTheme.colorScheme.Black
@@ -127,11 +129,13 @@ fun LocateScreen(
             }
             item {
                 Text(
-                    modifier = Modifier.padding(
-                        horizontal = 12.dp,
-                        vertical = 4.dp
-                    ),
-                    text = " 주변 NFC",
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 4.dp
+                        )
+                        .padding(start = 4.dp),
+                    text = "내 주변 트랩",
                     style = TravelingTheme.typography.headline2B,
                     color = TravelingTheme.colorScheme.Black
                 )

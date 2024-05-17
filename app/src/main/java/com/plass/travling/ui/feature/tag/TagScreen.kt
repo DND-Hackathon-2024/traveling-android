@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -66,6 +68,7 @@ import com.plass.travling.ui.component.DropShadowType
 import com.plass.travling.ui.component.TVCTAButton
 import com.plass.travling.ui.component.dropShadow
 import com.plass.travling.ui.component.travelingVerticalGradient
+import com.plass.travling.ui.feature.locate.RowShimmer
 import com.plass.travling.ui.theme.TravelingColor
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.Dispatchers
@@ -80,8 +83,8 @@ fun TagScreen(
 ) {
     val view = LocalView.current
     val coroutineScope = rememberCoroutineScope()
-    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", "", 0))}
-    var secondState by remember { mutableStateOf(PlaceResponse(0, "", "", "", -0, "", ))}
+    var state by remember { mutableStateOf<CouponResponse?>(null) }
+    var secondState by remember { mutableStateOf<PlaceResponse?>(null) }
     LifecycleResumeEffect(key1 = Unit) {
         val activity = (view.context as Activity)
         activity.window.statusBarColor = TravelingColor.Blue.toArgb()
@@ -119,125 +122,158 @@ fun TagScreen(
         }
     }
 
-    Box {
+    Box(
+        modifier = Modifier
+            .safeDrawingPadding()
+            .background(brush = travelingVerticalGradient())
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .safeDrawingPadding()
                 .background(brush = travelingVerticalGradient())
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 10.dp
-                ),
+                modifier = Modifier
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 10.dp
+                    )
+                    .align(Alignment.Start),
                 text = "태깅 성공",
                 color = TravelingTheme.colorScheme.White,
                 style = TravelingTheme.typography.headline1M
             )
             Spacer(modifier = Modifier.height(56.dp))
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "${state.location}에서\n새 트랩을 찾았어요!",
-                textAlign = TextAlign.Center,
-                color = TravelingTheme.colorScheme.White,
-                style = TravelingTheme.typography.title2B
-            )
+            if (state?.location == null) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    RowShimmer(width = 100.dp)
+                    RowShimmer(width = 200.dp)
+                }
+            } else {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "${state?.location}에서\n새 트랩을 찾았어요!",
+                    textAlign = TextAlign.Center,
+                    color = TravelingTheme.colorScheme.White,
+                    style = TravelingTheme.typography.title2B
+                )
+            }
             Spacer(modifier = Modifier.height(58.dp))
             Surface(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                shadowElevation = 4.dp,
                 shape = RoundedCornerShape(20.dp),
+                color = Color.Transparent
             ) {
-                Box {
-                    AsyncImage(
-                        modifier = Modifier.clip(RoundedCornerShape(20.dp)),
-                        model = secondState.imgUrl,
-                        contentDescription = "",
-                        contentScale = ContentScale.FillBounds
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(
-                                horizontal = 16.dp,
-                                vertical = 13.dp
-                            ),
-                        text = secondState.address,
-                        color = TravelingTheme.colorScheme.White,
-                        style = TravelingTheme.typography.headline2B
-                    )
+                if (secondState == null) {
+                    RowShimmer(width = 260.dp, height = 260.dp / 16f * 9f)
+                } else {
+                    Box {
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .aspectRatio(16f / 9f)
+                                .clip(RoundedCornerShape(20.dp)),
+                            model = secondState?.imgUrl,
+                            contentDescription = "",
+                            contentScale = ContentScale.FillBounds
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(
+                                    horizontal = 16.dp,
+                                    vertical = 13.dp
+                                ),
+                            text = secondState?.address ?: "",
+                            color = TravelingTheme.colorScheme.White,
+                            style = TravelingTheme.typography.headline2B
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            Image(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .fillMaxWidth(),
-                painter = painterResource(id = R.drawable.ic_polygon),
-                contentDescription = ""
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .background(
-                        color = TravelingTheme.colorScheme.White,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp
-                    ),
-                    text = if (state.trapId == 0) "" else "찾지 못한 트랩이 1개 더 있어요!",
-                    color = TravelingTheme.colorScheme.Black,
-                    style = TravelingTheme.typography.labelMedium
-                )
-            }
-
-
-            Spacer(modifier = Modifier.height(98.dp))
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp
-                    ),
-                text = "${if (state.trapId != 0) 1 else ""}개의 쿠폰을 발견했어요",
-                color = TravelingTheme.colorScheme.White,
-                style = TravelingTheme.typography.headline1B
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Coupon(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 22.dp),
-                title = "${state.couponDiscount} 할인 쿠폰",
-                description = state.description,
-                category = "대구"
-            )
-
-            Spacer(modifier = Modifier.height(74.dp))
-            Row(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            if (state?.trapId != null) {
                 Image(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_instargram),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.ic_polygon),
                     contentDescription = ""
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .background(
+                            color = TravelingTheme.colorScheme.White,
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier.padding(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        ),
+                        text = if (state?.trapId == 0) "" else "찾지 못한 트랩이 1개 더 있어요!",
+                        color = TravelingTheme.colorScheme.Black,
+                        style = TravelingTheme.typography.labelMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(98.dp))
+            if (state == null) {
+                RowShimmer(width = 140.dp)
+            } else {
                 Text(
-                    text = "공유",
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        ),
+                    text = "${if (state?.trapId != 0) 1 else ""}개의 쿠폰을 발견했어요",
                     color = TravelingTheme.colorScheme.White,
-                    style = TravelingTheme.typography.headline2B
+                    style = TravelingTheme.typography.headline1B
                 )
             }
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            if (state == null) {
+                RowShimmer(width = 280.dp, height = 72.dp)
+            } else {
+                Coupon(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 22.dp),
+                    title = "${state?.couponDiscount} 할인 쿠폰",
+                    description = state?.description ?: "",
+                    category = "대구"
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+//            Row(
+//                modifier = Modifier.align(Alignment.CenterHorizontally),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Image(
+//                    modifier = Modifier.size(24.dp),
+//                    painter = painterResource(id = R.drawable.ic_instargram),
+//                    contentDescription = ""
+//                )
+//                Spacer(modifier = Modifier.width(8.dp))
+//                Text(
+//                    text = "공유",
+//                    color = TravelingTheme.colorScheme.White,
+//                    style = TravelingTheme.typography.headline2B
+//                )
+//            }
+//            Spacer(modifier = Modifier.height(14.dp))
         }
         Column {
             Spacer(modifier = Modifier.weight(1f))
@@ -260,7 +296,6 @@ fun TagScreen(
 private fun Preview() {
     TagScreen(navController = rememberNavController(), data = "", {})
 }
-
 
 
 @Composable
@@ -347,7 +382,7 @@ private fun TagTVCTAButton(
                     Icon(
                         modifier = Modifier
                             .size(20.dp),
-                        painter =  painterResource(id = it),
+                        painter = painterResource(id = it),
                         tint = textColor,
                         contentDescription = null
                     )
