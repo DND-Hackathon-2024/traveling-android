@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.plass.travling.ui.feature.home.HomeScreen
 import androidx.navigation.navArgument
+import com.plass.travling.ui.feature.coupon.CouponScreen
 import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.join.JoinScreen
@@ -63,8 +64,6 @@ class MainActivity : ComponentActivity() {
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         pending = PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
 
-
-        window.statusBarColor = TravelingColor.White.toArgb()
 
         setContent {
             val coroutineScope = rememberCoroutineScope()
@@ -180,11 +179,29 @@ class MainActivity : ComponentActivity() {
                                     changeBottomNav = changeBottomNav,
                                 )
                             }
+
+                            composable(
+                                route = NavRoot.COUPON,
+                                arguments = listOf(
+                                    navArgument("id") { type = NavType.IntType}
+                                )
+                            ) {
+                                CouponScreen(
+                                    navController = navHostController,
+                                    id = it.arguments?.getInt("id")!!
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        this.window.statusBarColor = TravelingColor.Blue.toArgb()
     }
 
 

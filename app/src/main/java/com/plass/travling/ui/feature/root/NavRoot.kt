@@ -10,4 +10,5 @@ object NavRoot {
     const val HOME = "HOME"
 
     const val TAGGING = "TAGGING/{data}"
+    const val COUPON = "COUPON/{id}"
 }

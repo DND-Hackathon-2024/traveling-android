@@ -34,6 +34,7 @@ import com.plass.travling.R
 import com.plass.travling.ui.component.Coupon
 import com.plass.travling.ui.component.TVTopAppBar
 import com.plass.travling.ui.component.bounceClick
+import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravelingTheme
 
 @Composable
@@ -45,9 +46,9 @@ fun HomeScreen(
     }
     val testItems by remember {
         mutableStateOf(listOf(
-            CouponModel("40% 할인 쿠폰", "다른 쿠폰와 교환 가능", "대구"),
-            CouponModel("100% 할인 쿠폰", "형이 쏜다", "대구"),
-            CouponModel("10% 할인 쿠폰", "\"예성이\"와 교환 가능", "대구"),
+            CouponModel(0, "40% 할인 쿠폰", "다른 쿠폰와 교환 가능", "대구"),
+            CouponModel(1, "100% 할인 쿠폰", "형이 쏜다", "대구"),
+            CouponModel(2, "10% 할인 쿠폰", "\"예성이\"와 교환 가능", "대구"),
         ))
     }
 
@@ -130,7 +131,12 @@ fun HomeScreen(
                 Coupon(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = 12.dp)
+                        .bounceClick {
+                            navController.navigate(
+                                NavRoot.COUPON.replace("{id}", "${it.id}")
+                            )
+                        },
                     title = it.title,
                     description = it.description,
                     category = it.category,
@@ -165,6 +171,7 @@ fun LocationCell(
 }
 
 data class CouponModel(
+    val id: Int = 0,
     val title: String,
     val description: String,
     val category: String
