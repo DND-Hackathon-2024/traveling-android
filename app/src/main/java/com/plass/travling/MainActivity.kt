@@ -26,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.plass.travling.ui.feature.locate.LocateItem
+import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.nfc.NfcReadScreen
 import com.plass.travling.ui.feature.nfc.NfcWriteScreen
 import com.plass.travling.ui.feature.root.BottomNavItem
@@ -53,7 +54,7 @@ class MainActivity : ComponentActivity() {
             var navItems by remember { mutableStateOf(listOf(
                 BottomNavItem(NavRoot.MAIN, true, R.drawable.ic_home),
                 BottomNavItem("nfc", false, R.drawable.ic_nfc),
-                BottomNavItem(NavRoot.NFC_WRITE, false, R.drawable.ic_locate),
+                BottomNavItem(NavRoot.LOCATE, false, R.drawable.ic_locate),
             )) }
 
             var isShowBottomNavigationBar by remember { mutableStateOf(true) }
@@ -100,9 +101,6 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(NavRoot.MAIN) {
                                 Column {
-                                    LocateItem(locate = "test", resId = R.drawable.ic_profile, distance = 5, like = 3) {
-
-                                    }
                                     Button(onClick = { navHostController.navigate(NavRoot.NFC_WRITE) }) {
                                         Text(text = "쓰기")
                                     }
@@ -119,6 +117,9 @@ class MainActivity : ComponentActivity() {
 
                             composable(NavRoot.NFC_READ) {
                                 NfcReadScreen(navController = navHostController)
+                            }
+                            composable(NavRoot.LOCATE) {
+                                LocateScreen(navController = navHostController)
                             }
                         }
                     }

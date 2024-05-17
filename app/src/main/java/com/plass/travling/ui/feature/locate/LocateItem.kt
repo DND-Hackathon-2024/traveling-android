@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.plass.travling.R
 import com.plass.travling.ui.component.rippleClickable
 import com.plass.travling.ui.theme.TravelingTheme
@@ -28,7 +29,7 @@ import com.plass.travling.ui.theme.TravelingTheme
 @Composable
 fun LocateItem(
     locate: String,
-    @DrawableRes resId: Int,
+    image: String,
     distance: Int,
     like: Int,
     onClickItem: () -> Unit
@@ -43,11 +44,11 @@ fun LocateItem(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                Image(
+                AsyncImage(
+                    model = image,
                     modifier = Modifier
                         .size(64.dp)
                         .clip(RoundedCornerShape(16.dp)),
-                    painter = painterResource(id = resId),
                     contentDescription = "",
                     contentScale = ContentScale.Crop
                 )
@@ -61,7 +62,7 @@ fun LocateItem(
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = distance.toString(),
+                        text = distance.toString() + "km 이내",
                         style = TravelingTheme.typography.labelRegular,
                         color = TravelingTheme.colorScheme.Gray6
                     )
@@ -79,7 +80,7 @@ fun LocateItem(
                     colorFilter = ColorFilter.tint(TravelingTheme.colorScheme.Gray98)
                 )
                 Text(
-                    text = like.toString(),
+                    text = (if (like > 99) 99 else like).toString(),
                     style = TravelingTheme.typography.labelRegular,
                     color = TravelingTheme.colorScheme.Gray98
                 )
