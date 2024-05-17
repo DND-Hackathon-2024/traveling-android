@@ -34,6 +34,7 @@ import com.plass.travling.ui.component.TVTextField
 import com.plass.travling.ui.component.TVTopAppBar
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravelingTheme
+import com.plass.travling.utiles.TAG
 import com.plass.travling.utiles.showShortToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,10 +50,10 @@ fun LoginScreen(
     }
 
     var id by remember {
-        mutableStateOf("test")
+        mutableStateOf("")
     }
     var pw by remember {
-        mutableStateOf("test")
+        mutableStateOf("")
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -119,6 +120,7 @@ fun LoginScreen(
                             }
                         }
                     }.onFailure {
+                        Log.d(TAG, "LoginScreen: $it")
                         sendMessage("로그인에 실패하였습니다.")
                     }
                 }
