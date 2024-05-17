@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 
 fun Modifier.rippleClickable(
-    enabled: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) = composed { this.clickable(
     onClick = onClick,
