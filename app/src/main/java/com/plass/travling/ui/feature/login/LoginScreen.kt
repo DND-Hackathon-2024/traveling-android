@@ -1,5 +1,6 @@
 package com.plass.travling.ui.feature.login
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -101,15 +102,20 @@ fun LoginScreen(
                     return@TVCTAButton
                 }
                 coroutineScope.launch(Dispatchers.IO) {
-                    val token = RetrofitBuilder.getMemberApi().login(
-                        LoginRequest(
-                            phone = id,
-                            password = pw
+                    kotlin.runCatching {
+                        RetrofitBuilder.getMemberApi().login(
+                            LoginRequest(
+                                phone = id,
+                                password = pw
+                            )
                         )
-                    ).data
-                    SharedPreferencesManager.set("token", token)
-                    coroutineScope.launch(Dispatchers.Main) {
-                        navController.navigate(NavRoot.HOME)
+                    }.onSuccess {
+                        SharedPreferencesManager.set("token", it.data)
+                        coroutineScope.launch(Dispatchers.Main) {
+                            navController.navigate(NavRoot.HOME)
+                        }
+                    }.onFailure {
+                        sendMessage("로그인에 실패하였습니다.")
                     }
                 }
             }
