@@ -20,9 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.join.JoinScreen
@@ -33,6 +36,7 @@ import com.plass.travling.ui.feature.nfc.NfcWriteScreen
 import com.plass.travling.ui.feature.root.BottomNavItem
 import com.plass.travling.ui.feature.root.BottomNavigation
 import com.plass.travling.ui.feature.root.NavRoot
+import com.plass.travling.ui.feature.tag.TagScreen
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.launch
 
@@ -81,6 +85,15 @@ class MainActivity : ComponentActivity() {
                             onClickCancel = {
                                 coroutineScope.launch {
                                     isShowNfcDialog = false
+                                }
+                            },
+                            onSuccess = {
+                                coroutineScope.launch {
+                                    isShowNfcDialog = false
+                                    changeBottomNav(false)
+                                    navHostController.navigate(
+                                        NavRoot.TAGGING.replace("{data}", it)
+                                    )
                                 }
                             }
                         )
@@ -147,6 +160,18 @@ class MainActivity : ComponentActivity() {
                                 JoinScreen(navController = navHostController) {
                                     changeBottomNav(false)
                                 }
+                            }
+
+                            composable(
+                                route = NavRoot.TAGGING,
+                                arguments = listOf(
+                                    navArgument("data") { type = NavType.StringType }
+                                )
+                            ) {
+                                TagScreen(
+                                    navController = navHostController,
+                                    data = it.arguments?.getString("data")!!
+                                )
                             }
                         }
                     }
