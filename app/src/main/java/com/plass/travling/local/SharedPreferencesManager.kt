@@ -9,7 +9,7 @@ object SharedPreferencesManager {
 
     fun getInstance(): SharedPreferences {
         if (instance == null) {
-            instance = TravelingApplication().getSharedPreferences("traveling", MODE_PRIVATE)
+            instance = TravelingApplication.context?.getSharedPreferences("traveling", MODE_PRIVATE)
         }
         return instance!!
     }
