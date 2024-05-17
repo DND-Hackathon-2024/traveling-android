@@ -54,7 +54,7 @@ fun HomeScreen(
     var location by remember {
         mutableStateOf("전체")
     }
-    
+
     var state by remember { mutableStateOf(emptyList<CouponResponse>()) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current

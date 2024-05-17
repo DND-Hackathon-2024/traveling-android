@@ -32,9 +32,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +56,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.plass.travling.R
+import com.plass.travling.remote.RetrofitBuilder
+import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.ui.component.ButtonState
 import com.plass.travling.ui.component.Coupon
 import com.plass.travling.ui.component.DropShadowType
@@ -62,6 +66,9 @@ import com.plass.travling.ui.component.dropShadow
 import com.plass.travling.ui.component.travelingVerticalGradient
 import com.plass.travling.ui.theme.TravelingColor
 import com.plass.travling.ui.theme.TravelingTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun TagScreen(
@@ -70,12 +77,28 @@ fun TagScreen(
     changeBottomNav: (visible: Boolean) -> Unit
 ) {
     val view = LocalView.current
+    val coroutineScope = rememberCoroutineScope()
+    var state by remember { mutableStateOf(CouponResponse(0, "", "", "", "", "", ""))}
     LifecycleResumeEffect(key1 = Unit) {
         val activity = (view.context as Activity)
         activity.window.statusBarColor = TravelingColor.Blue.toArgb()
 
         onPauseOrDispose {
             activity.window.statusBarColor = TravelingColor.White.toArgb()
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        coroutineScope.launch(Dispatchers.IO) {
+            kotlin.runCatching {
+                RetrofitBuilder.getCouponApi().couponById(data.replace("\u0000", "").toInt())
+            }.onSuccess {
+                coroutineScope.launch(Dispatchers.Main) {
+                    state = it.data
+                }
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
     }
 
@@ -106,7 +129,7 @@ fun TagScreen(
         Spacer(modifier = Modifier.height(56.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "${data}에서\n새 트랩을 찾았어요!",
+            text = "${state.location}에서\n새 트랩을 찾았어요!",
             textAlign = TextAlign.Center,
             color = TravelingTheme.colorScheme.White,
             style = TravelingTheme.typography.title2B
@@ -130,7 +153,7 @@ fun TagScreen(
                             horizontal = 16.dp,
                             vertical = 13.dp
                         ),
-                    text = "대구 z존\n역사와 전통의 도서관",
+                    text = "${state.location}",
                     color = TravelingTheme.colorScheme.White,
                     style = TravelingTheme.typography.headline2B
                 )
@@ -182,8 +205,8 @@ fun TagScreen(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(horizontal = 22.dp),
-            title = "40% 할인 쿠폰",
-            description = "\"병준이와 단둘이 데이트권\"과 교환 가능",
+            title = "${state.couponDiscount} 할인 쿠폰",
+            description = state.description,
             category = "대구"
         )
 
