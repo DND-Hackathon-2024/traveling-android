@@ -1,5 +1,6 @@
 package com.plass.travling
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NfcAdapter
@@ -9,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,6 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -40,6 +45,7 @@ import com.plass.travling.ui.feature.root.BottomNavItem
 import com.plass.travling.ui.feature.root.BottomNavigation
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.feature.tag.TagScreen
+import com.plass.travling.ui.theme.TravelingColor
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.launch
 
@@ -50,11 +56,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         val launchIntent = Intent(this, this.javaClass)
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         pending = PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
+
+
+        window.statusBarColor = TravelingColor.White.toArgb()
 
         setContent {
             val coroutineScope = rememberCoroutineScope()
@@ -106,6 +116,7 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {
                             if (isShowBottomNavigationBar) {
                                 BottomNavigation(
+                                    modifier = Modifier,
                                     items = navItems,
                                     onClickItem = { item ->
                                         val items = navItems.map {
@@ -165,7 +176,8 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 TagScreen(
                                     navController = navHostController,
-                                    data = it.arguments?.getString("data")!!
+                                    data = it.arguments?.getString("data")!!,
+                                    changeBottomNav = changeBottomNav,
                                 )
                             }
                         }
