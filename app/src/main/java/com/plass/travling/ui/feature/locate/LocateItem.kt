@@ -86,7 +86,6 @@ fun LocateItem(
                     style = TravelingTheme.typography.labelRegular,
                     color = TravelingTheme.colorScheme.Gray98
                 )
-
             }
             Spacer(modifier = Modifier.height(8.dp))
         }

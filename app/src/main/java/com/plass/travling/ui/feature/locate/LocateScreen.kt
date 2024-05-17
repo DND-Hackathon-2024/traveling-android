@@ -2,13 +2,16 @@ package com.plass.travling.ui.feature.locate
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.plass.travling.remote.RetrofitBuilder
 import com.plass.travling.remote.response.PlaceResponse
+import com.plass.travling.ui.component.shimmerEffect
 import com.plass.travling.ui.component.travelingHorizontalGradient
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.Dispatchers
@@ -35,21 +39,29 @@ fun LocateScreen(
     navController: NavController
 ) {
     val coroutineScope = rememberCoroutineScope()
-
+    var isFetching by remember { mutableStateOf(true) }
     var nowItem1 by remember { mutableStateOf(emptyList<PlaceResponse>()) }
     var nowItem2 by remember { mutableStateOf(emptyList<PlaceResponse>()) }
 
     LaunchedEffect(key1 = true) {
         coroutineScope.launch(Dispatchers.IO) {
             kotlin.runCatching {
+                coroutineScope.launch(Dispatchers.Main) {
+                    isFetching = true
+                }
                 RetrofitBuilder.getPlaceApi().getPlaceList()
             }.onSuccess {
                 Log.d("TAG", "LocateScreen: ")
                 val data = it.data
                 nowItem1 = data.subList(0, 2)
                 nowItem2 = data.subList(2, data.size-1)
+                coroutineScope.launch(Dispatchers.Main) {
+                    isFetching = false
+                }
             }.onFailure {
-
+                coroutineScope.launch(Dispatchers.Main) {
+                    isFetching = false
+                }
             }
         }
     }
@@ -85,20 +97,33 @@ fun LocateScreen(
                     color = TravelingTheme.colorScheme.Black
                 )
             }
-            items(nowItem1) {
-                LocateItem(
-                    locate = it.placeName,
-                    image = it.imgUrl,
-                    distance = Random.nextInt(1, 10),
-                    like = Random.nextInt(1, 10),
-                ) {
-
+            if (isFetching) {
+                items(3) {
+                    Box(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .padding(horizontal = 12.dp)
+                            .fillMaxWidth()
+                            .height(72.dp)
+                            .background(shimmerEffect(), RoundedCornerShape(4.dp))
+                    )
                 }
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = Color(0xFFF4F5F9)
-                )
+            } else {
+                items(nowItem1) {
+                    LocateItem(
+                        locate = it.placeName,
+                        image = it.imgUrl,
+                        distance = Random.nextInt(1, 10),
+                        like = Random.nextInt(1, 10),
+                    ) {
+
+                    }
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = Color(0xFFF4F5F9)
+                    )
+                }
             }
             item {
                 Text(
@@ -111,23 +136,35 @@ fun LocateScreen(
                     color = TravelingTheme.colorScheme.Black
                 )
             }
-            items(nowItem2) {
-                LocateItem(
-                    locate = it.placeName,
-                    image = it.imgUrl,
-                    distance = Random.nextInt(1, 10),
-                    like = Random.nextInt(1, 10),
-                ) {
-
+            if (isFetching) {
+                items(6) {
+                    Box(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .padding(horizontal = 12.dp)
+                            .fillMaxWidth()
+                            .height(72.dp)
+                            .background(shimmerEffect(), RoundedCornerShape(4.dp))
+                    )
                 }
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = Color(0xFFF4F5F9)
-                )
+            } else {
+                items(nowItem2) {
+                    LocateItem(
+                        locate = it.placeName,
+                        image = it.imgUrl,
+                        distance = Random.nextInt(1, 10),
+                        like = Random.nextInt(1, 10),
+                    ) {
+
+                    }
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = Color(0xFFF4F5F9)
+                    )
+                }
             }
         }
-
     }
 }
 

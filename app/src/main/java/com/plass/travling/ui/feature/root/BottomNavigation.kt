@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.plass.travling.R
 import com.plass.travling.ui.component.DropShadowType
+import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.component.dropShadow
 import com.plass.travling.ui.component.`if`
 import com.plass.travling.ui.component.rippleClickable
@@ -80,9 +81,7 @@ fun BottomNavigation(
                             modifier = Modifier
                                 .size(24.dp)
                                 .align(Alignment.Center)
-                                .rippleClickable(
-                                    onClick = onClickNfc,
-                                ),
+                                .bounceClick(onClick = onClickNfc),
                             painter = painterResource(id = item.resId),
                             contentDescription = "",
                             colorFilter = ColorFilter.tint(TravelingColor.White)
@@ -93,11 +92,11 @@ fun BottomNavigation(
                     Image(
                         modifier = Modifier
                             .size(32.dp)
-                            .rippleClickable(
-                                enabled = !item.isSelected
-                            ) {
-                                onClickItem(item)
-                            },
+                            .bounceClick(onClick = {
+                                if (!item.isSelected) {
+                                    onClickItem(item)
+                                }
+                            }),
                         painter = painterResource(id = item.resId),
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(if (item.isSelected) TravelingColor.BlackBrown else TravelingColor.Gray)

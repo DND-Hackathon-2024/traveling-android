@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +40,7 @@ import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.ui.component.Coupon
 import com.plass.travling.ui.component.TVTopAppBar
 import com.plass.travling.ui.component.bounceClick
+import com.plass.travling.ui.component.shimmerEffect
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravelingTheme
 import com.plass.travling.utiles.showShortToast
@@ -55,14 +55,17 @@ fun HomeScreen(
     var location by remember {
         mutableStateOf("전체")
     }
+    var isFetching by remember {
+        mutableStateOf(false)
+    }
 
-    var state by remember { mutableStateOf(emptyList<CouponResponse>()) }
+    var coupons by remember { mutableStateOf(emptyList<CouponResponse>()) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val clearState: () -> Unit = {
         coroutineScope.launch(Dispatchers.Main) {
-            state = emptyList()
+            coupons = emptyList()
         }
     }
 
@@ -71,27 +74,37 @@ fun HomeScreen(
             clearState()
             if (location == "전체") {
                 kotlin.runCatching {
+                    coroutineScope.launch(Dispatchers.Main) {
+                        isFetching = true
+                    }
                     RetrofitBuilder.getCouponApi().couponAll()
                 }.onSuccess {
                     coroutineScope.launch(Dispatchers.Main) {
-                        state = it.data
+                        isFetching = false
+                        coupons = it.data
                     }
                 }.onFailure {
                     coroutineScope.launch(Dispatchers.Main) {
+                        isFetching = false
                         context.showShortToast("불러오기에 실패하였습니다.")
                     }
                 }
             } else {
                 Log.d("TAG", "HomeScreen: called $location")
                 kotlin.runCatching {
+                    coroutineScope.launch(Dispatchers.Main) {
+                        isFetching = true
+                    }
                     RetrofitBuilder.getCouponApi().couponWithLocation(location)
                 }.onSuccess {
                     coroutineScope.launch(Dispatchers.Main) {
-                        state = it.data
+                        coupons = it.data
+                        isFetching = false
                     }
                 }.onFailure {
                     coroutineScope.launch(Dispatchers.Main) {
                         context.showShortToast("불러오기에 실패하였습니다.")
+                        isFetching = false
                     }
                 }
             }
@@ -159,7 +172,7 @@ fun HomeScreen(
                 top = 4.dp,
                 bottom = 4.dp
             ),
-            text = "사용가능한 트랩이\n${state.size}개 남아있어요",
+            text = "사용가능한 트랩이\n${coupons.size}개 남아있어요",
             color = TravelingTheme.colorScheme.Black,
             style = TravelingTheme.typography.headline2B
         )
@@ -178,21 +191,33 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(state) {
-                Coupon(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
-                        .bounceClick {
-                            navController.navigate(
-                                NavRoot.COUPON.replace("{id}", "${it.couponId}")
-                            )
-                        },
-                    title = it.couponName,
-                    description = it.description,
-                    category = it.location,
-                    isHome = true
-                )
+            if (isFetching) {
+                items(3) {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                            .fillMaxWidth()
+                            .height(72.dp)
+                            .background(shimmerEffect(), RoundedCornerShape(4.dp))
+                    )
+                }
+            } else {
+                items(coupons) {
+                    Coupon(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp)
+                            .bounceClick {
+                                navController.navigate(
+                                    NavRoot.COUPON.replace("{id}", "${it.couponId}")
+                                )
+                            },
+                        title = it.couponName,
+                        description = it.description,
+                        category = it.location,
+                        isHome = true
+                    )
+                }
             }
         }
     }
