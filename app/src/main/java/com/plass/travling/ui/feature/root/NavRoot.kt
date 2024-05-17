@@ -8,4 +8,6 @@ object NavRoot {
     const val LOGIN = "LOGIN"
     const val JOIN = "JOIN"
     const val HOME = "HOME"
+
+    const val TAGGING = "TAGGING/{data}"
 }

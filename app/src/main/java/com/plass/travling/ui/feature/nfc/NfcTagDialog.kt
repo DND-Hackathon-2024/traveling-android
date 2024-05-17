@@ -42,7 +42,7 @@ fun NfcTagDialog(
     title: String,
     description: String,
     onClickCancel: () -> Unit,
-    onClickConfirm: () -> Unit
+    onSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
     val activity = (context as Activity) as MainActivity
@@ -67,7 +67,7 @@ fun NfcTagDialog(
                         ndef.connect()
                         val record = ndef.ndefMessage.records.first()
 
-                        sendMessage(String(record.payload))
+                        onSuccess(String(record.payload))
                     }
                 } catch (e: Exception) {
                     sendMessage("(0) ${e.message.toString()}")
