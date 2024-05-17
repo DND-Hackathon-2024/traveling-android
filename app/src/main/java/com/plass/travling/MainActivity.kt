@@ -128,59 +128,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        nfcAdapter.enableReaderMode(this, NfcAdapter.ReaderCallback { tag: Tag? ->
-//            val testData = "https://byungjuns.xyz"
-//            val message = NdefMessage(NdefRecord.createUri(testData))
-//            val size = message.toByteArray().size
-//
-//            try {
-//                val ndef = Ndef.get(tag)
-//                if (ndef != null) {
-//                    ndef.connect()
-//                    if (!ndef.isWritable) {
-//                        Log.e("enter", "cannot write")
-//                    }
-//                    if (ndef.maxSize < size) {
-//                        Log.e("enter", "cannot size exception")
-//                    }
-//                    ndef.writeNdefMessage(message)
-//                    Log.d("TAG", "onStart: 성공")
-////                    vm.nfcSuccess()
-//                }
-//            } catch (e: Exception) {
-//                Log.i("writeError", e.message.toString());
-//            }},
-//            NfcAdapter.FLAG_READER_NFC_A
-//                    or NfcAdapter.FLAG_READER_NFC_B
-//                    or NfcAdapter.FLAG_READER_NFC_F
-//                    or NfcAdapter.FLAG_READER_NFC_V
-//                    or NfcAdapter.FLAG_READER_NFC_BARCODE,
-//            null)
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        nfcAdapter.disableReaderMode(this);
-//    }
 
     fun getNfcAdapter(): NfcAdapter = nfcAdapter
-    fun getPending(): PendingIntent = pending
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TravelingTheme {
-        Greeting("Android")
-    }
 }
