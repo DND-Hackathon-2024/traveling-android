@@ -8,6 +8,8 @@ object TravelingColor {
     val White = Color(0xFFFFFFFF)
     val Blue = Color(0xFF0078F9)
     val Gray = Color(0xFFCCCCD6)
+    val Gray6 = Color(0xFF666666)
+    val Gray98 = Color(0xFF989898)
     val Transparent = Color(0x00000000)
 }
 
