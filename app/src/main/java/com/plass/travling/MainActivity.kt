@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.plass.travling.ui.feature.nfc.NfcWriteScreen
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravlingTheme
 
@@ -47,10 +48,14 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navHostController,
-                        startDestination = NavRoot.MAIN
+                        startDestination = NavRoot.NFC_WRITE
                     ) {
                         composable(NavRoot.MAIN) {
 
+                        }
+
+                        composable(NavRoot.NFC_WRITE) {
+                            NfcWriteScreen(navController = navHostController)
                         }
                     }
                 }
