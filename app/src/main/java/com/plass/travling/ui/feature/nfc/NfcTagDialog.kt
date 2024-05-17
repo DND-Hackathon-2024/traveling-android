@@ -42,7 +42,6 @@ fun NfcTagDialog(
     title: String,
     description: String,
     onClickCancel: () -> Unit,
-    onClickConfirm: () -> Unit
 ) {
     val context = LocalContext.current
     val activity = (context as Activity) as MainActivity

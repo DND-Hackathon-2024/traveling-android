@@ -82,9 +82,6 @@ class MainActivity : ComponentActivity() {
                                 coroutineScope.launch {
                                     isShowNfcDialog = false
                                 }
-                            },
-                            onClickConfirm = {
-
                             }
                         )
                     }
