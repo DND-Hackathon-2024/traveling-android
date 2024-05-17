@@ -18,6 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravlingTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,54 +38,62 @@ class MainActivity : ComponentActivity() {
         pending = PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
 
         setContent {
+            val navHostController = rememberNavController()
             TravlingTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    NavHost(
+                        navController = navHostController,
+                        startDestination = NavRoot.MAIN
+                    ) {
+                        composable(NavRoot.MAIN) {
+
+                        }
+                    }
                 }
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        nfcAdapter.enableReaderMode(this, NfcAdapter.ReaderCallback { tag: Tag? ->
-            val testData = "https://byungjuns.xyz"
-            val message = NdefMessage(NdefRecord.createUri(testData))
-            val size = message.toByteArray().size
-
-            try {
-                val ndef = Ndef.get(tag)
-                if (ndef != null) {
-                    ndef.connect()
-                    if (!ndef.isWritable) {
-                        Log.e("enter", "cannot write")
-                    }
-                    if (ndef.maxSize < size) {
-                        Log.e("enter", "cannot size exception")
-                    }
-                    ndef.writeNdefMessage(message)
-                    Log.d("TAG", "onStart: 성공")
-//                    vm.nfcSuccess()
-                }
-            } catch (e: Exception) {
-                Log.i("writeError", e.message.toString());
-            }},
-            NfcAdapter.FLAG_READER_NFC_A
-                    or NfcAdapter.FLAG_READER_NFC_B
-                    or NfcAdapter.FLAG_READER_NFC_F
-                    or NfcAdapter.FLAG_READER_NFC_V
-                    or NfcAdapter.FLAG_READER_NFC_BARCODE,
-            null)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        nfcAdapter.disableReaderMode(this);
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        nfcAdapter.enableReaderMode(this, NfcAdapter.ReaderCallback { tag: Tag? ->
+//            val testData = "https://byungjuns.xyz"
+//            val message = NdefMessage(NdefRecord.createUri(testData))
+//            val size = message.toByteArray().size
+//
+//            try {
+//                val ndef = Ndef.get(tag)
+//                if (ndef != null) {
+//                    ndef.connect()
+//                    if (!ndef.isWritable) {
+//                        Log.e("enter", "cannot write")
+//                    }
+//                    if (ndef.maxSize < size) {
+//                        Log.e("enter", "cannot size exception")
+//                    }
+//                    ndef.writeNdefMessage(message)
+//                    Log.d("TAG", "onStart: 성공")
+////                    vm.nfcSuccess()
+//                }
+//            } catch (e: Exception) {
+//                Log.i("writeError", e.message.toString());
+//            }},
+//            NfcAdapter.FLAG_READER_NFC_A
+//                    or NfcAdapter.FLAG_READER_NFC_B
+//                    or NfcAdapter.FLAG_READER_NFC_F
+//                    or NfcAdapter.FLAG_READER_NFC_V
+//                    or NfcAdapter.FLAG_READER_NFC_BARCODE,
+//            null)
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        nfcAdapter.disableReaderMode(this);
+//    }
 
     fun getNfcAdapter(): NfcAdapter = nfcAdapter
 }
