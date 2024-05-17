@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,14 +27,20 @@ import com.plass.travling.ui.theme.TravelingTheme
 fun TVTopAppBar(
     modifier: Modifier = Modifier,
     text: String,
-    backgroundColor: Color = TravelingTheme.colorScheme.White,
+    backgroundColor: Color = TravelingTheme.colorScheme.Blue,
     onClickBackButton: (() -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = Modifier
-            .background(backgroundColor)
+            .background(
+                color = backgroundColor,
+                shape = RoundedCornerShape(
+                    bottomStart = 18.dp,
+                    bottomEnd = 18.dp
+                )
+            )
             .safeDrawingPadding()
     ) {
         Row(
@@ -56,15 +63,16 @@ fun TVTopAppBar(
                         contentDescription = null
                     )
                 }
-                val textStyle =
-                    if (onClickBackButton == null) TravelingTheme.typography.title2B
-                    else TravelingTheme.typography.headline2M
+                val textStyle = TravelingTheme.typography.title1B
                 Text(
                     modifier = Modifier
-                        .padding(start = 8.dp),
+                        .padding(
+                            start = 12.dp,
+                            top = 12.dp
+                        ),
                     text = text,
                     style = textStyle,
-                    color = TravelingTheme.colorScheme.Black
+                    color = TravelingTheme.colorScheme.White
                 )
             }
 
