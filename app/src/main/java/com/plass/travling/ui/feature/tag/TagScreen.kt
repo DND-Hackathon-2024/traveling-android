@@ -183,6 +183,10 @@ fun TagScreen(
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds
                         )
+                        var text = secondState?.address?: ""
+                        text = if (text.length > 9) {
+                            text.slice(0..<9) + "..."
+                        } else text
                         Text(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
@@ -190,7 +194,7 @@ fun TagScreen(
                                     horizontal = 16.dp,
                                     vertical = 13.dp
                                 ),
-                            text = secondState?.address ?: "",
+                            text =  text,
                             color = TravelingTheme.colorScheme.White,
                             style = TravelingTheme.typography.headline2B
                         )
@@ -227,7 +231,7 @@ fun TagScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(98.dp))
+            Spacer(modifier = Modifier.height(72.dp))
             if (state == null) {
                 RowShimmer(width = 140.dp)
             } else {
@@ -274,6 +278,7 @@ fun TagScreen(
 //                )
 //            }
 //            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(108.dp))
         }
         Column {
             Spacer(modifier = Modifier.weight(1f))

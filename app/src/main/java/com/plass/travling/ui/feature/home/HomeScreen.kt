@@ -218,6 +218,9 @@ fun HomeScreen(
                         isHome = true
                     )
                 }
+                item {
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
         }
     }
