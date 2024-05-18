@@ -1,5 +1,6 @@
 package com.plass.travling.ui.feature.coupon
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -45,6 +45,7 @@ import com.plass.travling.ui.component.Category
 import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.component.shimmerEffect
 import com.plass.travling.ui.theme.TravelingTheme
+import com.plass.travling.utiles.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -62,13 +63,16 @@ fun CouponScreen(
         changeBottomNav(false)
         coroutineScope.launch(Dispatchers.IO) {
             kotlin.runCatching {
-                RetrofitBuilder.getCouponApi().couponById(id)
+                RetrofitBuilder.getCouponApi().couponById(id).data
             }.onSuccess { firstData ->
+                coroutineScope.launch(Dispatchers.Main) {
+                    state = firstData
+                }
                 kotlin.runCatching {
-                    RetrofitBuilder.getPlaceApi().getTrap(firstData.data.trapId)
+                    Log.d(TAG, "CouponScreen: ${firstData.trap}")
+                    RetrofitBuilder.getPlaceApi().getTrap(firstData.trap.firstOrNull()?.id?: -1)
                 }.onSuccess { secondData ->
                     coroutineScope.launch(Dispatchers.Main) {
-                        state = firstData.data
                         secondState = secondData.data
                     }
                 }.onFailure {

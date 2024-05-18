@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -53,7 +52,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -64,15 +62,11 @@ import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.remote.response.PlaceResponse
 import com.plass.travling.ui.component.ButtonState
 import com.plass.travling.ui.component.Coupon
-import com.plass.travling.ui.component.DropShadowType
-import com.plass.travling.ui.component.TVCTAButton
-import com.plass.travling.ui.component.dropShadow
 import com.plass.travling.ui.component.travelingVerticalGradient
 import com.plass.travling.ui.feature.locate.RowShimmer
 import com.plass.travling.ui.theme.TravelingColor
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -100,7 +94,7 @@ fun TagScreen(
                 RetrofitBuilder.getCouponApi().couponById(data.replace("\u0000", "").toInt())
             }.onSuccess { firstData ->
                 kotlin.runCatching {
-                    RetrofitBuilder.getPlaceApi().getTrap(firstData.data.trapId)
+                    RetrofitBuilder.getPlaceApi().getTrap(firstData.data.trap.first().id)
                 }.onSuccess { secondData ->
                     coroutineScope.launch(Dispatchers.Main) {
                         state = firstData.data
@@ -202,7 +196,7 @@ fun TagScreen(
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            if (state?.trapId != null) {
+            if (state?.trap != null) {
                 Image(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
@@ -224,7 +218,7 @@ fun TagScreen(
                             horizontal = 12.dp,
                             vertical = 8.dp
                         ),
-                        text = if (state?.trapId == 0) "" else "찾지 못한 트랩이 1개 더 있어요!",
+                        text = "찾지 못한 트랩이 1개 더 있어요!",
                         color = TravelingTheme.colorScheme.Black,
                         style = TravelingTheme.typography.labelMedium
                     )
@@ -242,7 +236,7 @@ fun TagScreen(
                             horizontal = 12.dp,
                             vertical = 8.dp
                         ),
-                    text = "${if (state?.trapId != 0) 1 else ""}개의 쿠폰을 발견했어요",
+                    text = "1개의 쿠폰을 발견했어요",
                     color = TravelingTheme.colorScheme.White,
                     style = TravelingTheme.typography.headline1B
                 )

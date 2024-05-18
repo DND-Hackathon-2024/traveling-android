@@ -3,8 +3,8 @@ package com.plass.travling.remote.response
 import com.google.gson.annotations.SerializedName
 
 data class CouponResponse(
-    @SerializedName("couponId")
-    val couponId: Int,
+    @SerializedName("id")
+    val id: Int,
     @SerializedName("code")
     val code: String,
     @SerializedName("couponName")
@@ -17,7 +17,7 @@ data class CouponResponse(
     val couponDiscount: String,
     @SerializedName("couponCreateUserName")
     val couponCreateUserName: String,
-    @SerializedName("trapId")
-    val trapId: Int
+    @SerializedName("trap")
+    val trap: List<PlaceResponse>
 
 )

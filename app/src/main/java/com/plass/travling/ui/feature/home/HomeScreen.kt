@@ -47,6 +47,7 @@ import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.component.shimmerEffect
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.theme.TravelingTheme
+import com.plass.travling.utiles.TAG
 import com.plass.travling.utiles.showShortToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -103,7 +104,8 @@ fun HomeScreen(
             }.onSuccess {
                 coroutineScope.launch(Dispatchers.Main) {
                     tf = ""
-                    content = it.message
+                    content = it.massage
+                    Log.d(TAG, "handleAI: ${it}")
                     showAI = true
                 }
             }.onFailure {  }
@@ -125,6 +127,7 @@ fun HomeScreen(
                         coupons = it.data
                     }
                 }.onFailure {
+                    Log.d(TAG, "HomeScreen: $it")
                     coroutineScope.launch(Dispatchers.Main) {
                         isFetching = false
                         context.showShortToast("불러오기에 실패하였습니다.")
@@ -276,7 +279,7 @@ fun HomeScreen(
                             .padding(horizontal = 12.dp)
                             .bounceClick {
                                 navController.navigate(
-                                    NavRoot.COUPON.replace("{id}", "${it.couponId}")
+                                    NavRoot.COUPON.replace("{id}", "${it.id}")
                                 )
                             },
                         title = it.couponName,

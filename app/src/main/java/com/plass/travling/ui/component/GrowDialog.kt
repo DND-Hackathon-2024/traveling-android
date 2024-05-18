@@ -22,7 +22,6 @@ import com.plass.travling.ui.theme.TravelingTheme
 fun GrowDialog(
     title: String,
     content: String? = null,
-    dismissText: String = "닫기",
     onDismissRequest: () -> Unit
 ) {
     Dialog(
