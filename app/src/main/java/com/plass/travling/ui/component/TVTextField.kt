@@ -93,7 +93,7 @@ fun TVTextField(
                     Text(
                         text = hint,
                         style = textStyle,
-                        color = TravelingTheme.colorScheme.Black
+                        color = TravelingTheme.colorScheme.Gray6
                     )
                 },
                 label = null,

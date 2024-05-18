@@ -57,10 +57,10 @@ fun NfcReadScreen(
                         ndef.connect()
                         val record = ndef.ndefMessage.records.first()
 
-                        sendMessage(String(record.payload))
+//                        sendMessage(String(record.payload))
                     }
                 } catch (e: Exception) {
-                    sendMessage("(0) ${e.message.toString()}")
+//                    sendMessage("(0) ${e.message.toString()}")
                     Log.i("writeError", e.message.toString());
                 }},
             NfcAdapter.FLAG_READER_NFC_A

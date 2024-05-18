@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.plass.travling.remote.Json.isJsonArray
 import com.plass.travling.remote.Json.isJsonObject
 import com.plass.travling.remote.interceptor.TokenInterceptor
+import com.plass.travling.remote.service.AIAPI
 import com.plass.travling.remote.service.CouponAPI
 import com.plass.travling.remote.service.MemberAPI
 import com.plass.travling.remote.service.PlaceApi
@@ -74,4 +75,6 @@ object RetrofitBuilder {
 
     fun getPlaceApi(): PlaceApi =
         getRetrofit().create(PlaceApi::class.java)
+
+    fun getAI(): AIAPI = getRetrofit().create(AIAPI::class.java)
 }

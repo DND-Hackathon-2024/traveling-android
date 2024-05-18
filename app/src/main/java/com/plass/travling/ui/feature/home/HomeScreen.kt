@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +40,8 @@ import com.plass.travling.R
 import com.plass.travling.remote.RetrofitBuilder
 import com.plass.travling.remote.response.CouponResponse
 import com.plass.travling.ui.component.Coupon
+import com.plass.travling.ui.component.GrowDialog
+import com.plass.travling.ui.component.TVTextField
 import com.plass.travling.ui.component.TVTopAppBar
 import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.component.shimmerEffect
@@ -61,11 +65,48 @@ fun HomeScreen(
 
     var coupons by remember { mutableStateOf(emptyList<CouponResponse>()) }
     val coroutineScope = rememberCoroutineScope()
+    var tf by remember {
+        mutableStateOf("")
+    }
     val context = LocalContext.current
 
     val clearState: () -> Unit = {
         coroutineScope.launch(Dispatchers.Main) {
             coupons = emptyList()
+        }
+    }
+
+    var content by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    var showAI by remember {
+        mutableStateOf(false)
+    }
+    if (showAI) {
+        GrowDialog(
+            title = "AI의 답변이에요",
+            content = content
+        ) {
+            showAI = false
+        }
+    }
+
+    fun handleAI() {
+        coroutineScope.launch(Dispatchers.IO) {
+            if (tf.isEmpty()) {
+                return@launch
+            }
+            kotlin.runCatching {
+                val t = RetrofitBuilder.getAI().get(tf)
+                t
+            }.onSuccess {
+                coroutineScope.launch(Dispatchers.Main) {
+                    tf = ""
+                    content = it.message
+                    showAI = true
+                }
+            }.onFailure {  }
         }
     }
 
@@ -166,13 +207,39 @@ fun HomeScreen(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            TVTextField(
+                modifier = Modifier
+                    .weight(1f),
+                hint = "AI에게 여행지에 관한 뭐든 물어보세요",
+                value = tf,
+                onValueChange = { tf = it }
+            )
+            Icon(
+                modifier = Modifier
+                    .bounceClick(onClick = {
+                        handleAI()
+                    })
+                    .size(24.dp),
+                painter = painterResource(id = R.drawable.ic_search),
+                tint = Color(0xFF989899),
+                contentDescription = null
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             modifier = Modifier.padding(
                 start = 12.dp,
                 top = 4.dp,
                 bottom = 4.dp
             ),
-            text = "사용가능한 트랩이\n${coupons.size}개 남아있어요",
+            text = "사용가능한 쿠폰이\n${coupons.size}개 남아있어요",
             color = TravelingTheme.colorScheme.Black,
             style = TravelingTheme.typography.headline2B
         )
