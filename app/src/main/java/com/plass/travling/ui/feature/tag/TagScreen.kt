@@ -1,6 +1,10 @@
 package com.plass.travling.ui.feature.tag
 
 import android.app.Activity
+import android.nfc.NfcAdapter
+import android.nfc.Tag
+import android.nfc.tech.Ndef
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -31,6 +35,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -47,15 +52,18 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.plass.travling.MainActivity
 import com.plass.travling.R
 import com.plass.travling.remote.RetrofitBuilder
 import com.plass.travling.remote.response.CouponResponse
@@ -106,6 +114,26 @@ fun TagScreen(
             }.onFailure {
                 it.printStackTrace()
             }
+        }
+    }
+
+    val context = LocalContext.current
+    val activity = (context as Activity) as MainActivity
+    val adapter = activity.getNfcAdapter()
+
+
+    LifecycleStartEffect(key1 = Unit) {
+        adapter.enableReaderMode(
+            activity, NfcAdapter.ReaderCallback { tag: Tag? ->
+            },
+            NfcAdapter.FLAG_READER_NFC_A
+                    or NfcAdapter.FLAG_READER_NFC_B
+                    or NfcAdapter.FLAG_READER_NFC_F
+                    or NfcAdapter.FLAG_READER_NFC_V
+                    or NfcAdapter.FLAG_READER_NFC_BARCODE,
+            null)
+        onStopOrDispose {
+            adapter.disableReaderMode(activity)
         }
     }
 
