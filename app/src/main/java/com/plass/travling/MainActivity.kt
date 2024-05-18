@@ -1,5 +1,6 @@
 package com.plass.travling
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NfcAdapter
@@ -9,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,6 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,6 +32,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.plass.travling.ui.feature.home.HomeScreen
 import androidx.navigation.navArgument
+import com.plass.travling.local.SharedPreferencesManager
+import com.plass.travling.ui.feature.coupon.CouponScreen
 import com.plass.travling.ui.feature.nfc.NfcTagDialog
 import com.plass.travling.ui.feature.locate.LocateScreen
 import com.plass.travling.ui.feature.join.JoinScreen
@@ -40,6 +47,7 @@ import com.plass.travling.ui.feature.root.BottomNavItem
 import com.plass.travling.ui.feature.root.BottomNavigation
 import com.plass.travling.ui.feature.root.NavRoot
 import com.plass.travling.ui.feature.tag.TagScreen
+import com.plass.travling.ui.theme.TravelingColor
 import com.plass.travling.ui.theme.TravelingTheme
 import kotlinx.coroutines.launch
 
@@ -50,11 +58,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         val launchIntent = Intent(this, this.javaClass)
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         pending = PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
+
 
         setContent {
             val coroutineScope = rememberCoroutineScope()
@@ -106,6 +116,7 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {
                             if (isShowBottomNavigationBar) {
                                 BottomNavigation(
+                                    modifier = Modifier,
                                     items = navItems,
                                     onClickItem = { item ->
                                         val items = navItems.map {
@@ -130,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         NavHost(
                             modifier = Modifier.padding(it),
                             navController = navHostController,
-                            startDestination = NavRoot.HOME
+                            startDestination = getStartDestination()
                         ) {
 
                             composable(NavRoot.NFC_WRITE) {
@@ -154,7 +165,10 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             composable(NavRoot.HOME) {
-                                HomeScreen(navController = navHostController)
+                                HomeScreen(
+                                    navController = navHostController,
+                                    changeBottomVisible = changeBottomNav
+                                )
                             }
 
                             composable(
@@ -165,7 +179,21 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 TagScreen(
                                     navController = navHostController,
-                                    data = it.arguments?.getString("data")!!
+                                    data = it.arguments?.getString("data")!!,
+                                    changeBottomNav = changeBottomNav,
+                                )
+                            }
+
+                            composable(
+                                route = NavRoot.COUPON,
+                                arguments = listOf(
+                                    navArgument("id") { type = NavType.IntType}
+                                )
+                            ) {
+                                CouponScreen(
+                                    navController = navHostController,
+                                    id = it.arguments?.getInt("id")!!,
+                                    changeBottomNav = changeBottomNav
                                 )
                             }
                         }
@@ -174,6 +202,18 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        this.window.statusBarColor = TravelingColor.Blue.toArgb()
+    }
+
+    private fun getStartDestination(): String {
+        val token = SharedPreferencesManager.get("token") ?: ""
+        return if (token.isEmpty()) NavRoot.LOGIN else NavRoot.HOME
+    }
+
 
 
     fun getNfcAdapter(): NfcAdapter = nfcAdapter

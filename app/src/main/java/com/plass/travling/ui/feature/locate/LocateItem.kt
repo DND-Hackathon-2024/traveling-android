@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.plass.travling.R
+import com.plass.travling.ui.component.bounceClick
 import com.plass.travling.ui.component.rippleClickable
 import com.plass.travling.ui.theme.TravelingTheme
 
@@ -36,7 +38,8 @@ fun LocateItem(
 ) {
     Box(
         modifier = Modifier
-            .rippleClickable(onClick = onClickItem)
+            .fillMaxWidth()
+            .bounceClick(onClick = onClickItem)
     ) {
         Column(
             modifier = Modifier
@@ -84,7 +87,6 @@ fun LocateItem(
                     style = TravelingTheme.typography.labelRegular,
                     color = TravelingTheme.colorScheme.Gray98
                 )
-
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
